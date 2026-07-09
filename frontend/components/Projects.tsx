@@ -68,6 +68,7 @@ const accentClasses = {
 
 /* ── Section ──────────────────────────────────────────────────── */
 export function Projects() {
+
   return (
     <section id="projects" className="relative px-6 py-24 md:py-32">
       <div className="mx-auto max-w-6xl">
@@ -123,7 +124,7 @@ export function Projects() {
                         </h3>
                         <p className="font-mono text-xs text-muted-foreground">{project.tagline}</p>
                       </div>
-                      <a
+                      {/* <a
                         href={project.github}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -131,7 +132,7 @@ export function Projects() {
                         className="rounded-lg border border-border p-2 text-muted-foreground transition-all hover:border-border/60 hover:text-foreground"
                       >
                         <ArrowUpRight className="h-4 w-4" />
-                      </a>
+                      </a> */}
                     </div>
 
                     <p className="mt-3 text-sm leading-relaxed text-muted-foreground">

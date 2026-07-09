@@ -2,14 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Terminal, Box } from 'lucide-react'
+import { Menu, X, Terminal } from 'lucide-react'
 import { NAV_LINKS } from '@/lib/constants'
-import { useSceneVisibility } from '@/lib/sceneStore'
 
 export function Navbar() {
   const [scrolled,  setScrolled]  = useState(false)
   const [menuOpen,  setMenuOpen]  = useState(false)
-  const [is3DVisible, setIs3DVisible] = useSceneVisibility()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -64,15 +62,7 @@ export function Navbar() {
               </a>
             ))}
             
-            {/* 3D Shape Toggle Button */}
-            {/* <button
-              onClick={() => setIs3DVisible(!is3DVisible)}
-              className="group flex items-center gap-2 rounded-lg border border-border bg-input/40 px-3 py-1.5 font-mono text-xs text-muted-foreground transition-all duration-300 hover:border-primary/40 hover:text-foreground cursor-pointer"
-              title={is3DVisible ? 'Disable 3D Background' : 'Enable 3D Background'}
-            >
-              <Box className={`h-4 w-4 transition-all duration-300 ${is3DVisible ? 'animate-spin-slow text-primary drop-shadow-[0_0_8px_oklch(0.73_0.155_232_/_60%)]' : 'opacity-40'}`} />
-              <span className="tracking-wider">{is3DVisible ? '3D' : '2D'}</span>
-            </button> */}
+
 
             <a
               href="#contact"
@@ -131,17 +121,7 @@ export function Navbar() {
                 </motion.a>
               ))}
 
-              {/* Mobile 3D Toggle */}
-              <motion.button
-                onClick={() => setIs3DVisible(!is3DVisible)}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.08 + NAV_LINKS.length * 0.07 }}
-                className="mt-6 flex items-center gap-3 rounded-xl border border-border bg-input/50 px-6 py-3 font-mono text-base text-foreground cursor-pointer"
-              >
-                <Box className={`h-5 w-5 ${is3DVisible ? 'animate-spin-slow text-primary' : 'opacity-40'}`} />
-                <span>3D Graphics: {is3DVisible ? 'ON' : 'OFF'}</span>
-              </motion.button>
+
             </nav>
           </motion.div>
         )}

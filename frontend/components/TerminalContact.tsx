@@ -21,7 +21,7 @@ Available commands:
 
 const LS_TEXT = `
 /hero        — Introduction & CTA
-/projects    — Live interactive project demos
+/projects    — View featured full-stack projects
 /experience  — Work history & education
 /contact     — Contact form (you are here)
 `.trim()
@@ -33,6 +33,17 @@ export function TerminalContact() {
   const [mode,    setMode]    = useState<'form' | 'terminal'>('form')
   const [status,  setStatus]  = useState<FormStatus>('idle')
   const [errMsg,  setErrMsg]  = useState('')
+  const [copied,  setCopied]  = useState(false)
+
+  const handleEmailClick = (e: React.MouseEvent<HTMLAnchorElement>, label: string, href: string) => {
+    if (label === 'Email') {
+      e.preventDefault()
+      navigator.clipboard.writeText(EMAIL)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+      window.location.href = href
+    }
+  }
 
   /* ── Terminal state ─────────────────────────────────────────── */
   const [history, setHistory] = useState<string[]>([
@@ -369,15 +380,22 @@ export function TerminalContact() {
             { label: 'LinkedIn', href: LINKEDIN_URL },
             { label: 'Email',    href: `mailto:${EMAIL}` },
           ].map(({ label, href }) => (
-            <a
-              key={label}
-              href={href}
-              target={label !== 'Email' ? '_blank' : undefined}
-              rel={label !== 'Email' ? 'noopener noreferrer' : undefined}
-              className="rounded-xl border border-border px-5 py-3 font-mono text-sm text-muted-foreground transition-all duration-300 hover:border-primary/40 hover:bg-primary/5 hover:text-foreground"
-            >
-              {label}
-            </a>
+            <div key={label} className="relative">
+              <a
+                href={href}
+                onClick={(e) => handleEmailClick(e, label, href)}
+                target={label !== 'Email' ? '_blank' : undefined}
+                rel={label !== 'Email' ? 'noopener noreferrer' : undefined}
+                className="rounded-xl border border-border px-5 py-3 font-mono text-sm text-muted-foreground transition-all duration-300 hover:border-primary/40 hover:bg-primary/5 hover:text-foreground block"
+              >
+                {label}
+              </a>
+              {label === 'Email' && copied && (
+                <span className="absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-primary px-2 py-0.5 text-[10px] font-medium text-background shadow-md transition-all duration-300">
+                  Copied!
+                </span>
+              )}
+            </div>
           ))}
         </motion.div>
       </div>

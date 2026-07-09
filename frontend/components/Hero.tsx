@@ -77,6 +77,18 @@ const socials = [
 
 /* ── Hero section ─────────────────────────────────────────────── */
 export function Hero() {
+  const [copied, setCopied] = useState(false)
+
+  const handleSocialClick = (e: React.MouseEvent<HTMLAnchorElement>, label: string, href: string) => {
+    if (label === 'Email') {
+      e.preventDefault()
+      navigator.clipboard.writeText(EMAIL)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+      window.location.href = href
+    }
+  }
+
   return (
     <section
       id="hero"
@@ -149,16 +161,23 @@ export function Hero() {
             className="mt-8 flex items-center justify-center gap-5 md:justify-start"
           >
             {socials.map(({ icon: Icon, href, label }) => (
-              <a
-                key={label}
-                href={href}
-                target={label !== 'Email' ? '_blank' : undefined}
-                rel={label !== 'Email' ? 'noopener noreferrer' : undefined}
-                aria-label={label}
-                className="text-muted-foreground transition-all duration-300 hover:scale-110 hover:text-primary"
-              >
-                <Icon className="h-5 w-5" />
-              </a>
+              <div key={label} className="relative">
+                <a
+                  href={href}
+                  onClick={(e) => handleSocialClick(e, label, href)}
+                  target={label !== 'Email' ? '_blank' : undefined}
+                  rel={label !== 'Email' ? 'noopener noreferrer' : undefined}
+                  aria-label={label}
+                  className="text-muted-foreground transition-all duration-300 hover:scale-110 hover:text-primary block"
+                >
+                  <Icon className="h-5 w-5" />
+                </a>
+                {label === 'Email' && copied && (
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-primary px-2 py-0.5 text-[10px] font-medium text-background shadow-md transition-all duration-300">
+                    Copied!
+                  </span>
+                )}
+              </div>
             ))}
           </motion.div>
         </motion.div>

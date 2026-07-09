@@ -47,9 +47,9 @@ function SceneContent() {
         depth={50}
         count={5000}
         factor={4}
-        saturation={10}
+        saturation={0}
         fade={true}
-        speed={2}
+        speed={1}
       />
     </group>
   )
@@ -57,7 +57,7 @@ function SceneContent() {
 
 export function CanvasBackground() {
   return (
-    <div className="fixed inset-0 -z-10 pointer-events-none bg-[#0g0912]">  
+    <div className="fixed inset-0 -z-10 pointer-events-none bg-[#090912]">  
       <Canvas
         camera={{ position: [0, 0, 5], fov: 60 }}
         gl={{ antialias: true, alpha: true }}
