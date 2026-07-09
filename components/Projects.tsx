@@ -1,13 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Tilt from 'react-parallax-tilt'
-import { ArrowUpRight, ChevronDown } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { GITHUB_URL } from '@/lib/constants'
-import { TastebudsDemo }    from '@/components/demos/TastebudsDemo'
-import { SocialConnectDemo } from '@/components/demos/SocialConnectDemo'
-import { LinkforgeDemo }     from '@/components/demos/LinkforgeDemo'
 
 /* ── Project data ─────────────────────────────────────────────── */
 const PROJECTS = [
@@ -19,8 +15,8 @@ const PROJECTS = [
       'An intelligent meal-planning platform that generates personalized full-day meal plans based on dietary preferences, ingredient exclusions, and caloric targets. Powered by Google Gemini with structured JSON schema output.',
     stack:       ['Node.js', 'Express.js', 'PostgreSQL', 'Gemini API', 'React'],
     github:      `${GITHUB_URL}/tastebuds`,
+    live:        'https://tastebuds.sumeetkanhiya.dev',
     accent:      'blue' as const,
-    demo:        <TastebudsDemo />,
   },
   {
     id:          'socialconnect',
@@ -30,8 +26,8 @@ const PROJECTS = [
       'A full-featured social platform with live messaging, presence indicators, and a normalized PostgreSQL schema. Native WebSocket frames (no polling) with Redis pub/sub for horizontal scaling.',
     stack:       ['WebSockets', 'Node.js', 'Express.js', 'PostgreSQL', 'Redis'],
     github:      `${GITHUB_URL}/socialconnect`,
+    live:        'https://socialconnect.sumeetkanhiya.dev',
     accent:      'violet' as const,
-    demo:        <SocialConnectDemo />,
   },
   {
     id:          'linkforge',
@@ -41,12 +37,10 @@ const PROJECTS = [
       'A full-stack URL utility tool with custom alias support, click analytics, QR code generation, and sub-25ms redirect latency. Built on Next.js Edge runtime with PostgreSQL persistence.',
     stack:       ['Next.js', 'PostgreSQL', 'Edge Runtime', 'React'],
     github:      `${GITHUB_URL}/linkforge`,
+    live:        'https://linkforge.sumeetkanhiya.dev',
     accent:      'cyan' as const,
-    demo:        <LinkforgeDemo />,
   },
 ]
-
-type ProjectId = typeof PROJECTS[number]['id']
 
 const accentClasses = {
   blue: {
@@ -74,11 +68,6 @@ const accentClasses = {
 
 /* ── Section ──────────────────────────────────────────────────── */
 export function Projects() {
-  const [activeDemo, setActiveDemo] = useState<ProjectId | null>(null)
-
-  const toggle = (id: ProjectId) =>
-    setActiveDemo((prev) => (prev === id ? null : id))
-
   return (
     <section id="projects" className="relative px-6 py-24 md:py-32">
       <div className="mx-auto max-w-6xl">
@@ -90,15 +79,12 @@ export function Projects() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="mb-16 text-center"
         >
-          {/* <p className="mb-3 font-mono text-sm uppercase tracking-widest text-primary">
-            {'// 01. Featured Work'}
-          </p> */}
           <h2 className="font-display text-4xl font-bold tracking-tight text-foreground md:text-5xl">
             Things I&apos;ve Built
           </h2>
-          <div className="mx-auto mt-4 h-px w-20 bg-gradient-to-r from-primary to-accent" />
+          <div className="mx-auto mt-4 h-px w-25 bg-gradient-to-r from-primary to-accent" />
           <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
-            Click any project to expand a <span className="text-foreground font-medium">live interactive demo</span> — no backend required.
+            A selection of my recent <span className="text-foreground font-medium">full-stack projects</span>, showcasing scalable architectures, precise database schemas, and modern web technologies.
           </p>
         </motion.div>
 
@@ -106,7 +92,6 @@ export function Projects() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {PROJECTS.map((project, i) => {
             const ac = accentClasses[project.accent]
-            const isOpen = activeDemo === project.id
 
             return (
               <motion.div
@@ -115,17 +100,17 @@ export function Projects() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-60px' }}
                 transition={{ duration: 0.6, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                className={`${isOpen ? 'md:col-span-2 lg:col-span-3' : ''} transition-all duration-500`}
+                className="h-full"
               >
                 <Tilt
-                  tiltMaxAngleX={isOpen ? 0 : 6}
-                  tiltMaxAngleY={isOpen ? 0 : 6}
+                  tiltMaxAngleX={6}
+                  tiltMaxAngleY={6}
                   transitionSpeed={1600}
-                  scale={isOpen ? 1 : 1.02}
+                  scale={1.02}
                   className="h-full"
                 >
                   <article
-                    className={`glass group flex flex-col rounded-2xl p-6 transition-all duration-500 ${ac.border} ${ac.glow}`}
+                    className={`glass group flex flex-col h-full rounded-2xl p-6 transition-all duration-500 ${ac.border} ${ac.glow}`}
                   >
                     {/* Card header */}
                     <div className="flex items-start justify-between">
@@ -144,7 +129,6 @@ export function Projects() {
                         rel="noopener noreferrer"
                         aria-label={`${project.title} on GitHub`}
                         className="rounded-lg border border-border p-2 text-muted-foreground transition-all hover:border-border/60 hover:text-foreground"
-                        onClick={(e) => e.stopPropagation()}
                       >
                         <ArrowUpRight className="h-4 w-4" />
                       </a>
@@ -166,33 +150,30 @@ export function Projects() {
                       ))}
                     </div>
 
-                    {/* "Live Demo" toggle */}
-                    <button
-                      onClick={() => toggle(project.id as ProjectId)}
-                      className={`mt-5 flex items-center gap-1.5 self-start font-mono text-xs font-medium transition-colors ${ac.button}`}
-                    >
-                      <span>{isOpen ? 'Hide Demo' : 'Live Demo'}</span>
-                      <ChevronDown
-                        className={`h-3.5 w-3.5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-                      />
-                    </button>
+                    {/* Actions container */}
+                    <div className="mt-auto pt-6 flex items-center gap-5">
+                      {/* GitHub Link */}
+                      <a
+                        href={project.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`flex items-center gap-1.5 font-mono text-xs font-medium transition-colors ${ac.button}`}
+                      >
+                        <span>Repository</span>
+                        <ArrowUpRight className="h-3.5 w-3.5" />
+                      </a>
 
-                    {/* Expandable demo panel */}
-                    <AnimatePresence>
-                      {isOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{  opacity: 0, height: 0 }}
-                          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                          className="overflow-hidden"
-                        >
-                          <div className="mt-6 border-t border-border pt-6">
-                            {project.demo}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                      {/* Live Link */}
+                      <a
+                        href={project.live}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 font-mono text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <span>Live Site</span>
+                        <ArrowUpRight className="h-3.5 w-3.5" />
+                      </a>
+                    </div>
                   </article>
                 </Tilt>
               </motion.div>

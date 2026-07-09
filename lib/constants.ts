@@ -4,9 +4,9 @@
 ───────────────────────────────────────────────────────────── */
 
 export const GITHUB_USERNAME = 'sumeetkanhiya'
-export const GITHUB_URL      = `https://github.com/${GITHUB_USERNAME}`
-export const LINKEDIN_URL    = 'https://linkedin.com/in/sumeetkanhiya'
-export const EMAIL           = 'sumeetkanhiya@gmail.com'
+export const GITHUB_URL      = `https://github.com/sumeetkl11`
+export const LINKEDIN_URL    = 'https://www.linkedin.com/in/sumeet-kanhiya/'
+export const EMAIL           = 'sumeetkanhiya11@gmail.com'
 export const SITE_URL        = 'https://sumeetkanhiya.dev'
 
 export const FULL_NAME   = 'Sumeet Kanhiya'

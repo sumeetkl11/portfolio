@@ -7,11 +7,11 @@ import dynamic from 'next/dynamic'
  * Next.js 16 does not allow `ssr: false` inside Server Components.
  * The dynamic import here excludes Three.js from the server bundle entirely.
  */
-const SceneWrapper = dynamic(
-  () => import('@/components/three/SceneWrapper').then((m) => m.SceneWrapper),
+const CanvasBackground = dynamic(
+  () => import('@/components/CanvasBackground').then((m) => m.CanvasBackground),
   { ssr: false }
 )
 
 export function DynamicScene() {
-  return <SceneWrapper />
+  return <CanvasBackground />
 }
