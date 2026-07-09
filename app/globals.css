@@ -1,0 +1,185 @@
+/* ─────────────────────────────────────────────────────────────
+   The Digital Nexus — Global Styles
+   Framework : Tailwind CSS v4
+   Color model: oklch for perceptually uniform gradients
+───────────────────────────────────────────────────────────── */
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* ── Map CSS custom-properties → Tailwind theme tokens ────── */
+@theme inline {
+  --color-background:      var(--background);
+  --color-foreground:      var(--foreground);
+  --color-card:            var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary:         var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary:       var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted:           var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent:          var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive:     var(--destructive);
+  --color-border:          var(--border);
+  --color-input:           var(--input);
+  --color-ring:            var(--ring);
+  --color-glow:            var(--glow);
+  --font-sans:    var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif;
+  --font-display: var(--font-syne), 'Syne', 'Space Grotesk', sans-serif;
+  --font-mono:    var(--font-jetbrains-mono), 'JetBrains Mono', monospace;
+  --radius-sm:  calc(var(--radius) * 0.6);
+  --radius-md:  calc(var(--radius) * 0.8);
+  --radius-lg:  var(--radius);
+  --radius-xl:  calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+}
+
+/* ── Design token definitions (oklch) ───────────────────────── */
+:root {
+  color-scheme: dark;
+
+  /* Deep-space charcoal */
+  --background:            oklch(0.13 0.025 275);
+  --foreground:            oklch(0.96 0.006 260);
+
+  /* Glassmorphic card */
+  --card:                  oklch(0.17 0.025 270 / 55%);
+  --card-foreground:       oklch(0.96 0.006 260);
+
+  /* Electric blue — primary CTA */
+  --primary:               oklch(0.73 0.155 232);
+  --primary-foreground:    oklch(0.13 0.025 275);
+
+  /* Quiet neutral layer */
+  --secondary:             oklch(0.22 0.032 270);
+  --secondary-foreground:  oklch(0.96 0.006 260);
+
+  --muted:                 oklch(0.22 0.032 270);
+  --muted-foreground:      oklch(0.66 0.025 260);
+
+  /* Neon violet — accent / hover */
+  --accent:                oklch(0.60 0.20 292);
+  --accent-foreground:     oklch(0.98 0.005 260);
+
+  --destructive:           oklch(0.60 0.21 25);
+
+  /* Borders & inputs */
+  --border:                oklch(0.96 0.006 260 / 10%);
+  --input:                 oklch(0.96 0.006 260 / 14%);
+  --ring:                  oklch(0.73 0.155 232);
+
+  /* Glow color for neon effects */
+  --glow:                  oklch(0.68 0.18 278);
+
+  --radius: 0.75rem;
+}
+
+/* ── Base resets ─────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: oklch(0.73 0.155 232 / 30%);
+    color: oklch(0.73 0.155 232);
+  }
+}
+
+/* ── Utility classes ─────────────────────────────────────────── */
+@layer utilities {
+  /* Glassmorphism base card */
+  .glass {
+    background: var(--card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+  }
+
+  /* Gradient text: blue → violet */
+  .gradient-text {
+    background: linear-gradient(135deg, oklch(0.73 0.155 232), oklch(0.60 0.20 292));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Neon portrait glow */
+  .neon-portrait {
+    filter:
+      drop-shadow(0 0 24px oklch(0.60 0.20 292 / 45%))
+      drop-shadow(0 0 64px oklch(0.73 0.155 232 / 30%));
+  }
+
+  /* Glow pulse on interactive elements */
+  .glow-blue {
+    box-shadow:
+      0 0 20px oklch(0.73 0.155 232 / 40%),
+      0 0 40px oklch(0.73 0.155 232 / 20%);
+  }
+  .glow-violet {
+    box-shadow:
+      0 0 20px oklch(0.60 0.20 292 / 40%),
+      0 0 40px oklch(0.60 0.20 292 / 20%);
+  }
+
+  /* Terminal-style text */
+  .terminal-text {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+  }
+}
+
+/* ── Custom scrollbar ────────────────────────────────────────── */
+::-webkit-scrollbar         { width: 6px; }
+::-webkit-scrollbar-track   { background: oklch(0.13 0.025 275); }
+::-webkit-scrollbar-thumb   {
+  background: linear-gradient(180deg, oklch(0.73 0.155 232), oklch(0.60 0.20 292));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, oklch(0.80 0.14 232), oklch(0.68 0.18 292));
+}
+
+/* ── Animation: scroll-pulse (scroll indicator) ─────────────── */
+@keyframes scroll-pulse {
+  0%, 100% { transform: translateY(0);  opacity: 1; }
+  50%       { transform: translateY(6px); opacity: 0.4; }
+}
+.animate-scroll-pulse { animation: scroll-pulse 1.8s ease-in-out infinite; }
+
+/* ── Animation: float (hero portrait) ───────────────────────── */
+@keyframes float-portrait {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-14px); }
+}
+
+/* ── Animation: spin-slow ───────────────────────────────────── */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 10s linear infinite;
+}
+
+/* ── Reduced-motion overrides ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .animate-scroll-pulse { animation: none; }
+  .animate-spin-slow { animation: none; }
+}
