@@ -3,9 +3,10 @@
 import { useRef, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Stars } from '@react-three/drei'
+import { useReducedMotion } from 'framer-motion'
 import * as THREE from 'three'
 
-function SceneContent() {
+function SceneContent({ starCount }: { starCount: number }) {
   const groupRef = useRef<THREE.Group>(null)
   const mouseRef = useRef({ x: 0, y: 0 })
 
@@ -45,7 +46,7 @@ function SceneContent() {
       <Stars
         radius={100}
         depth={50}
-        count={5000}
+        count={starCount}
         factor={4}
         saturation={0}
         fade={true}
@@ -56,13 +57,17 @@ function SceneContent() {
 }
 
 export function CanvasBackground() {
+  const shouldReduceMotion = useReducedMotion()
+  // Reduce star count for users who prefer reduced motion (accessibility + low-end device perf)
+  const starCount = shouldReduceMotion ? 0 : 5000
+
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none bg-[#090912]">  
       <Canvas
         camera={{ position: [0, 0, 5], fov: 60 }}
-        gl={{ antialias: true, alpha: true }}
+        gl={{ antialias: false, alpha: true, powerPreference: 'low-power' }}
       >
-        <SceneContent />
+        <SceneContent starCount={starCount} />
       </Canvas>
     </div>
   )

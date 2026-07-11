@@ -3,8 +3,8 @@
    Update GITHUB_USERNAME once — every component inherits it.
 ───────────────────────────────────────────────────────────── */
 
-export const GITHUB_USERNAME = 'sumeetkanhiya'
-export const GITHUB_URL      = `https://github.com/sumeetkl11`
+export const GITHUB_USERNAME = 'sumeetkl11'
+export const GITHUB_URL      = `https://github.com/${GITHUB_USERNAME}`
 export const LINKEDIN_URL    = 'https://www.linkedin.com/in/sumeet-kanhiya/'
 export const EMAIL           = 'sumeetkanhiya11@gmail.com'
 export const SITE_URL        = 'https://sumeetkanhiya.dev'

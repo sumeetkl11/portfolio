@@ -1,20 +1,16 @@
 'use client'
 
-import { useState } from 'react'
 import { Terminal } from 'lucide-react'
 import { GITHUB_URL, LINKEDIN_URL, EMAIL, FULL_NAME } from '@/lib/constants'
+import { useCopyToClipboard } from '@/lib/hooks/useCopyToClipboard'
 
 export function Footer() {
-  const year = new Date().getFullYear()
-  const [copied, setCopied] = useState(false)
+  const { copied, copyToClipboard } = useCopyToClipboard()
 
   const handleEmailClick = (e: React.MouseEvent<HTMLAnchorElement>, label: string, href: string) => {
     if (label === 'Email') {
       e.preventDefault()
-      navigator.clipboard.writeText(EMAIL)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-      window.location.href = href
+      copyToClipboard(EMAIL)
     }
   }
 
@@ -30,8 +26,8 @@ export function Footer() {
         </div>
 
         {/* Copyright */}
-        <p className="font-mono text-xs text-muted-foreground text-center">
-          &copy; {year} {FULL_NAME}. { /* Designed &amp; engineered with Next.js, Three.js &amp; Tailwind.*/}
+        <p suppressHydrationWarning className="font-mono text-xs text-muted-foreground text-center">
+          &copy; {new Date().getFullYear()} {FULL_NAME}. { /* Designed &amp; engineered with Next.js, Three.js &amp; Tailwind.*/}
         </p>
 
         {/* Quick links */}
@@ -40,6 +36,7 @@ export function Footer() {
             { label: 'GitHub',   href: GITHUB_URL  },
             { label: 'LinkedIn', href: LINKEDIN_URL },
             { label: 'Email',    href: `mailto:${EMAIL}` },
+            { label: 'Resume',   href: '/resume' },
           ].map(({ label, href }) => (
             <div key={label} className="relative">
               <a

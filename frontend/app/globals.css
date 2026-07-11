@@ -183,3 +183,78 @@
   .animate-scroll-pulse { animation: none; }
   .animate-spin-slow { animation: none; }
 }
+
+/* ── Print stylesheet — clean single-page A4 resume ──────────── */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm;
+  }
+
+  /* Swap the entire dark palette to a clean document theme */
+  :root {
+    --background:            #ffffff;
+    --foreground:            #111111;
+    --card:                  #ffffff;
+    --card-foreground:       #111111;
+    --primary:               #2563eb;
+    --primary-foreground:    #ffffff;
+    --secondary:             #f3f4f6;
+    --secondary-foreground:  #111111;
+    --muted:                 #f3f4f6;
+    --muted-foreground:      #444444;
+    --accent:                #7c3aed;
+    --accent-foreground:     #ffffff;
+    --destructive:           #dc2626;
+    --border:                #d1d5db;
+    --input:                 #f9fafb;
+    --ring:                  #2563eb;
+    --glow:                  transparent;
+  }
+
+  html, body {
+    background: white !important;
+    color: #111 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Kill all decorative effects */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Hide elements not needed in resume PDF */
+  .print-hidden {
+    display: none !important;
+  }
+
+  /* The glass utility: flatten for print */
+  .glass {
+    background: white !important;
+    backdrop-filter: none !important;
+    border: none !important;
+  }
+
+  /* Gradient text: just use primary color */
+  .gradient-text {
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    -webkit-text-fill-color: var(--primary) !important;
+    color: var(--primary) !important;
+  }
+
+  /* Prevent content from breaking mid-section */
+  section { break-inside: avoid; }
+  h2, h3  { break-after: avoid; }
+
+  /* Tighten spacing for one-page fit */
+  .resume-print-tight h2 { font-size: 0.8rem !important; margin-bottom: 0.25rem !important; }
+  .resume-print-tight p,
+  .resume-print-tight li { font-size: 0.7rem !important; line-height: 1.45 !important; }
+  .resume-print-tight h3 { font-size: 0.75rem !important; }
+}

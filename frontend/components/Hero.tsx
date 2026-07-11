@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Github, Linkedin, Mail, ChevronDown } from 'lucide-react'
+import { Github, Linkedin, Mail, FileText } from 'lucide-react'
 import { GITHUB_URL, LINKEDIN_URL, EMAIL } from '@/lib/constants'
+import { useCopyToClipboard } from '@/lib/hooks/useCopyToClipboard'
 
 /* ── Profile image with error fallback ────────────────────────── */
 function ProfileImage() {
@@ -73,19 +74,17 @@ const socials = [
   { icon: Github,   href: GITHUB_URL,   label: 'GitHub'   },
   { icon: Linkedin, href: LINKEDIN_URL, label: 'LinkedIn' },
   { icon: Mail,     href: `mailto:${EMAIL}`, label: 'Email' },
+  { icon: FileText, href: '/resume', label: 'Resume' },
 ]
 
 /* ── Hero section ─────────────────────────────────────────────── */
 export function Hero() {
-  const [copied, setCopied] = useState(false)
+  const { copied, copyToClipboard } = useCopyToClipboard()
 
   const handleSocialClick = (e: React.MouseEvent<HTMLAnchorElement>, label: string, href: string) => {
     if (label === 'Email') {
       e.preventDefault()
-      navigator.clipboard.writeText(EMAIL)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-      window.location.href = href
+      copyToClipboard(EMAIL)
     }
   }
 
@@ -102,17 +101,6 @@ export function Hero() {
           animate="visible"
           className="order-2 text-center md:order-1 md:text-left"
         >
-          {/* "System initialized" badge
-          <motion.div variants={item}>
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 font-mono text-xs text-primary">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
-              </span>
-              {'// system.initialized — v2.0.0'}
-            </span>
-          </motion.div> */}
-
           <motion.p variants={item} className="mb-2 text-lg text-muted-foreground">
             Hi, I&apos;m
           </motion.p>
@@ -186,13 +174,6 @@ export function Hero() {
         <ProfileImage />
       </div>
 
-       {/* Scroll indicator  */}
-      {/* <div className="absolute inset-x-0 bottom-8 flex flex-col items-center gap-1 text-muted-foreground">
-        <span className="font-mono text-xs uppercase tracking-widest opacity-60">
-          Scroll to Explore
-        </span>
-        <ChevronDown className="animate-scroll-pulse h-5 w-5" aria-hidden="true" />
-      </div> */}
     </section>
   )
 }

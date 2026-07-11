@@ -7,6 +7,7 @@ import { motion }               from 'framer-motion'
 import { Terminal, Send, RotateCcw, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react'
 import { contactSchema, type ContactFormData, sanitizeText } from '@/lib/validators'
 import { GITHUB_URL, LINKEDIN_URL, EMAIL }                   from '@/lib/constants'
+import { useCopyToClipboard }                                from '@/lib/hooks/useCopyToClipboard'
 
 /* ── Terminal mode commands ───────────────────────────────────── */
 const HELP_TEXT = `
@@ -17,6 +18,7 @@ Available commands:
   whoami             About Sumeet
   clear              Clear terminal
   github             Open GitHub profile
+  resume             Open Resume page
 `.trim()
 
 const LS_TEXT = `
@@ -33,15 +35,12 @@ export function TerminalContact() {
   const [mode,    setMode]    = useState<'form' | 'terminal'>('form')
   const [status,  setStatus]  = useState<FormStatus>('idle')
   const [errMsg,  setErrMsg]  = useState('')
-  const [copied,  setCopied]  = useState(false)
+  const { copied, copyToClipboard } = useCopyToClipboard()
 
   const handleEmailClick = (e: React.MouseEvent<HTMLAnchorElement>, label: string, href: string) => {
     if (label === 'Email') {
       e.preventDefault()
-      navigator.clipboard.writeText(EMAIL)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-      window.location.href = href
+      copyToClipboard(EMAIL)
     }
   }
 
@@ -134,6 +133,10 @@ export function TerminalContact() {
         push(`Opening ${GITHUB_URL} …`)
         window.open(GITHUB_URL, '_blank', 'noopener,noreferrer')
         break
+      case 'resume':
+        push('Opening Resume …')
+        window.open('/resume', '_blank', 'noopener,noreferrer')
+        break
       case 'clear':
         setHistory(['Terminal cleared.', ''])
         break
@@ -163,9 +166,6 @@ export function TerminalContact() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="mb-12 text-center"
         >
-          {/* <p className="mb-3 font-mono text-sm uppercase tracking-widest text-primary">
-            {'// 03. Contact'}
-          </p> */}
           <h2 className="font-display text-4xl font-bold text-foreground md:text-5xl">
             Let&apos;s Build Something
             <br />
@@ -307,9 +307,6 @@ export function TerminalContact() {
                       )}
                     </button>
 
-                    {/* <p className="text-center font-mono text-[11px] text-muted-foreground/60">
-                      Fields validated with Zod · Inputs sanitized before transmission
-                    </p> */}
                   </form>
                 )}
               </>
@@ -322,7 +319,7 @@ export function TerminalContact() {
                 <div className="mb-4 h-64 overflow-y-auto rounded-xl border border-border bg-[#0d0d14] p-4 font-mono text-[12px] leading-6">
                   {history.map((line, i) => (
                     <div
-                      key={i}
+                      key={`line-${i}-${line.length}`}
                       className={`${
                         line.startsWith('sumeet@nexus')
                           ? 'text-primary'
@@ -360,7 +357,7 @@ export function TerminalContact() {
                 </form>
 
                 <p className="mt-3 font-mono text-[11px] text-muted-foreground/50">
-                  Try: <span className="text-primary">help</span> · <span className="text-primary">whoami</span> · <span className="text-primary">ls</span> · <span className="text-primary">github</span>
+                  Try: <span className="text-primary">help</span> · <span className="text-primary">whoami</span> · <span className="text-primary">ls</span> · <span className="text-primary">github</span> · <span className="text-primary">resume</span>
                 </p>
               </div>
             )}
@@ -379,6 +376,7 @@ export function TerminalContact() {
             { label: 'GitHub',   href: GITHUB_URL  },
             { label: 'LinkedIn', href: LINKEDIN_URL },
             { label: 'Email',    href: `mailto:${EMAIL}` },
+            { label: 'Resume',   href: '/resume' },
           ].map(({ label, href }) => (
             <div key={label} className="relative">
               <a
