@@ -116,11 +116,11 @@ export function Hero() {
 
           <motion.p
             variants={item}
-            className="mt-6 max-w-md text-lg leading-relaxed text-muted-foreground md:text-xl"
+            className="mt- max-w-md text-lg leading-relaxed text-muted-foreground md:text-x10"
           >
-            Full Stack Developer specializing in the{' '}
-            <span className="font-semibold text-foreground">PERN stack</span> and
-            scalable web architectures.
+            I build things that are{' '}
+            <span className="font-semibold text-foreground">fast, real-time, and memorable</span>—from
+            WebSocket platforms to Edge-deployed APIs and WebGL graphics.
           </motion.p>
 
           {/* CTA buttons */}
@@ -132,16 +132,23 @@ export function Hero() {
               href="#projects"
               className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-primary to-accent px-6 py-3 text-center font-semibold text-background transition-all duration-300 hover:shadow-[0_0_32px_oklch(0.73_0.155_232_/_40%)] sm:w-auto"
             >
-              <span className="relative z-10">View My Work</span>
+              <span className="relative z-10">View My Projects</span>
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-accent to-primary transition-transform duration-500 group-hover:translate-x-0" />
             </a>
             <a
               href="#contact"
               className="w-full rounded-xl border border-border bg-input px-6 py-3 text-center font-medium text-foreground backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:bg-primary/5 sm:w-auto"
             >
-              Get in Touch
+              Let&apos;s Build Something
             </a>
           </motion.div>
+
+          <motion.p
+            variants={item}
+            className="mt-4 text-xs font-mono text-muted-foreground/85"
+          >
+            ⚡ Available for full-stack or backend roles starting July 2026.
+          </motion.p>
 
           {/* Social links */}
           <motion.div

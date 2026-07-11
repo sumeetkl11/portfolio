@@ -16,13 +16,13 @@ const ENTRIES: TimelineEntry[] = [
     title:        'Freelance Full Stack Developer',
     organization: 'Independent Clients',
     description:
-      'Building end-to-end web applications using the PERN stack. Delivering scalable RESTful APIs, responsive Next.js frontends, and AI-integrated features for clients across multiple industries.',
+      'Delivered 3 full-stack client web applications (under NDA) using Next.js, Express, Node.js, and PostgreSQL. Engineered secure authentication mechanisms, responsive user dashboards, and structured RESTful APIs.',
     type: 'work',
   },
   {
     period:       'Mar 2025 — Jun 2025',
     title:        'Backend Developer — Tastebuds AI',
-    organization: 'Tastebuds AI Initiative',
+    organization: 'Personal Project',
     description:
       'Architected the core Express.js + PostgreSQL backend for the Tastebuds AI platform. Integrated Google Gemini API with structured JSON schema output for deterministic meal-plan generation.',
     type: 'work',

@@ -10,9 +10,9 @@ export const EMAIL           = 'sumeetkanhiya11@gmail.com'
 export const SITE_URL        = 'https://sumeetkanhiya.dev'
 
 export const FULL_NAME   = 'Sumeet Kanhiya'
-export const TITLE       = `${FULL_NAME} — Full Stack Developer`
+export const TITLE       = `${FULL_NAME} — Full Stack & Backend Engineer`
 export const DESCRIPTION =
-  'Full Stack Developer specializing in the PERN stack, scalable web architectures, and AI-integrated systems. Currently open to opportunities.'
+  'I build fast, real-time, and memorable web applications—from WebSocket platforms to Edge-deployed APIs and WebGL graphics. Available for full-stack and backend roles.'
 
 export const NAV_LINKS = [
   { label: 'About',      href: '#hero'       },

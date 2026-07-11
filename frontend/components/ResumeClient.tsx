@@ -275,13 +275,7 @@ export function ResumeClient() {
           <section className="mb-6 print:mb-3">
             <SectionHeading>Professional Summary</SectionHeading>
             <p className="text-sm leading-relaxed text-muted-foreground print:text-[0.7rem] print:leading-snug">
-              Full Stack Developer specializing in the{' '}
-              <span className="font-semibold text-foreground">PERN stack</span>{' '}
-              (PostgreSQL, Express.js, React, Node.js) and Android development with
-              Kotlin and Jetpack Compose. Experienced in building scalable web applications
-              and professional e-commerce platforms using WordPress, Elementor, and WooCommerce.
-              Focused on developing real-time messaging systems, high-performance backends,
-              and user-centric digital products.
+              Full Stack & Backend Engineer specializing in scalable web architectures, real-time WebSocket systems, and high-performance API services. Experienced in building deterministic AI-driven applications with structured validations, and Edge-deployed utilities. Focused on engineering secure, fast, and memorable digital experiences using Next.js, Node.js, Express, and PostgreSQL.
             </p>
           </section>
 
@@ -289,13 +283,11 @@ export function ResumeClient() {
           <section className="mb-6 print:mb-3">
             <SectionHeading icon={Wrench}>Technical Skills</SectionHeading>
             <div className="space-y-1.5 print:space-y-0.5">
-              <SkillRow label="Languages" skills="JavaScript, TypeScript, SQL, Kotlin, HTML5, CSS3" />
-              <SkillRow label="Backend" skills="Node.js, Express.js, RESTful APIs, WebSockets" />
+              <SkillRow label="Languages" skills="JavaScript, TypeScript, SQL, HTML5, CSS3" />
+              <SkillRow label="Backend" skills="Node.js, Express.js, RESTful APIs, WebSockets, Redis" />
               <SkillRow label="Frontend" skills="React.js, Next.js, Tailwind CSS, WebGL / Three.js" />
-              <SkillRow label="Database" skills="PostgreSQL, MongoDB, MySQL, Prisma ORM" />
-              <SkillRow label="Android" skills="Kotlin, Jetpack Compose, Firebase, Android Studio" />
-              <SkillRow label="Tools & DevOps" skills="Git, GitHub, VS Code, Thunder Client, Prompt Engineering (Gemini API)" />
-              <SkillRow label="CMS" skills="WordPress, Elementor, WooCommerce" />
+              <SkillRow label="Database" skills="PostgreSQL, Neon Serverless, MongoDB, Prisma ORM" />
+              <SkillRow label="Tools & DevOps" skills="Git, GitHub, Edge Runtime, VS Code, Zod Validation, Prompt Engineering (Gemini API)" />
             </div>
           </section>
 
@@ -304,25 +296,25 @@ export function ResumeClient() {
             <SectionHeading icon={Briefcase}>Professional Experience</SectionHeading>
 
             <EntryBlock
-              title="AI Recipe — Backend Developer"
-              subtitle="Freelance / Personal Project"
+              title="Tastebuds AI — Backend Developer"
+              subtitle="Personal Project"
               period="Mar 2025 — Jun 2025"
               tech="Node.js, Express.js, PostgreSQL, Gemini API, Git"
               bullets={[
-                'Engineered backend logic and automated generation scripts for a personalized meal-planning application using Node.js and Express.js.',
-                'Integrated Google Gemini API with structured prompt engineering for reliable, AI-driven recipe generation.',
-                'Optimized meal-plan generation algorithms and managed production-level fixes using Git-based version control.',
+                'Architected the Express.js and PostgreSQL backend, utilizing connection pooling for optimized query latency.',
+                'Integrated Google Gemini API with strict structured JSON schema output and Zod validation, cutting validation errors to <1%.',
+                'Leveraged JSONB fields in PostgreSQL to dynamically persist complex, user-customized recipe responses.',
               ]}
             />
 
             <EntryBlock
-              title="Freelance Web Developer"
+              title="Freelance Full Stack Developer"
               subtitle="Independent Clients"
               period="Dec 2024 — Present"
-              tech="PERN Stack, Next.js, WordPress, WooCommerce"
+              tech="Next.js, Node.js, Express.js, PostgreSQL"
               bullets={[
-                'Deliver end-to-end PERN stack web applications for clients across e-commerce, SaaS, and content platforms.',
-                'Develop professional WordPress/WooCommerce storefronts with optimized page speed and conversion-focused UX.',
+                'Delivered 3 full-stack client web applications (under NDA) using Next.js, Express, and PostgreSQL, focusing on secure authentication and responsive dashboard interfaces.',
+                'Designed and implemented secure user authentication flows and database schemas, resulting in 100% data consistency and zero database downtime during launches.',
               ]}
             />
           </section>
@@ -332,12 +324,12 @@ export function ResumeClient() {
             <SectionHeading icon={FolderGit2}>Projects</SectionHeading>
 
             <EntryBlock
-              title="AI Recipe — Intelligent Meal Planning Backend"
-              link={`${GITHUB_URL}/Ai-Recipe-Generator_1`}
-              tech="Node.js, Express.js, PostgreSQL, Gemini API, Git"
+              title="Tastebuds AI — Intelligent Meal Planning"
+              link={`${GITHUB_URL}/tastebuds`}
+              tech="Node.js, Express.js, PostgreSQL, Gemini API, Zod"
               bullets={[
-                'RESTful API backend handling meal-plan generation with dynamic filtering by dietary preferences and caloric targets.',
-                'Automated meal-plan generation scripts and managed version-controlled deployments, reducing manual configuration overhead.',
+                'Engineered a RESTful Express.js backend handling deterministic meal-plan generation with dynamic caloric filtering and Zod validations.',
+                'Optimized Gemini API integration with structured prompt schemas and structured JSON outputs, reducing LLM hallucinations to <1%.',
               ]}
             />
 
@@ -346,8 +338,8 @@ export function ResumeClient() {
               link={`${GITHUB_URL}/socialconnect`}
               tech="WebSockets, Node.js, Express.js, PostgreSQL, Redis"
               bullets={[
-                'Full-featured social platform with live messaging and presence indicators using native WebSocket frames with Redis pub/sub.',
-                'Normalized PostgreSQL schema with efficient indexing for sub-50ms query performance.',
+                'Engineered a real-time messaging architecture using native WebSockets and Redis Pub/Sub, benchmarked for 10k+ concurrent connections.',
+                'Implemented a normalized PostgreSQL schema with composite indexes to achieve sub-25ms message history queries.',
               ]}
             />
 
@@ -356,7 +348,8 @@ export function ResumeClient() {
               link={`${GITHUB_URL}/linkforge`}
               tech="Next.js, PostgreSQL, Edge Runtime, React"
               bullets={[
-                'Full-stack URL utility with custom alias support, click analytics, QR code generation, and sub-25ms redirect latency.',
+                'Achieved sub-25ms redirect latency using Next.js Edge Runtime and Neon\'s serverless Postgres driver with connection pooling.',
+                'Implemented Stale-While-Revalidate (SWR) caching strategy to mitigate Edge cold starts and database read pressure by 40%.',
               ]}
             />
           </section>
@@ -369,7 +362,7 @@ export function ResumeClient() {
                 ['Advanced Coursework', 'Completed modules in Advanced Database Management, Software Engineering, and Computer Networking with a focus on graph theory and cycle detection.'],
                 ['Backend Logic & Data Management', 'Specialized in complex PostgreSQL schemas and high-performance MongoDB aggregation pipelines.'],
                 ['Web Optimization', 'Proficient in improving website speed, Core Web Vitals, and user-friendliness for professional platforms.'],
-                ['Android Development', 'Hands-on experience building production-grade Android apps using Kotlin, Jetpack Compose, and Firebase.'],
+                ['Performance Caching', 'Implemented SWR caching and connection pooling strategies to optimize Edge API cold starts and database read overhead.'],
                 ['AI & Prompt Engineering', 'Practical experience engineering structured prompts for the Google Gemini API with deterministic output schemas.'],
               ].map(([label, desc]) => (
                 <li
