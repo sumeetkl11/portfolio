@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Terminal } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { NAV_LINKS } from '@/lib/constants'
+import { BrandLogo } from './BrandLogo'
 
 export function Navbar() {
   const [scrolled,  setScrolled]  = useState(false)
@@ -36,18 +37,7 @@ export function Navbar() {
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
           {/* Logo */}
-          <a
-            href="#hero"
-            className="group flex items-center gap-2 text-sm font-bold tracking-tight"
-            aria-label="The Digital Nexus — home"
-          >
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-background transition-transform duration-300 group-hover:scale-110">
-              <Terminal className="h-4 w-4" />
-            </span>
-            <span className="font-display text-foreground">
-              Sumeet<span className="text-primary">.</span>
-            </span>
-          </a>
+          <BrandLogo />
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-6">
