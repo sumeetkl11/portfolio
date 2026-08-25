@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
     url: SITE_URL,
-    siteName: 'The Digital Nexus',
+    siteName: 'Sumeet Kanhiya Portfolio',
     type: 'website',
     locale: 'en_US',
     images: [
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: `${TITLE} — The Digital Nexus`,
+        alt: `${TITLE} — Sumeet Kanhiya Portfolio`,
       },
     ],
   },

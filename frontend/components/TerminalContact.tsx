@@ -46,7 +46,7 @@ export function TerminalContact() {
 
   /* ── Terminal state ─────────────────────────────────────────── */
   const [history, setHistory] = useState<string[]>([
-    'The Digital Nexus Terminal [v2.0.0]',
+    'Sumeet Kanhiya Portfolio Terminal [v2.0.0]',
     'Type "help" for available commands.',
     '',
   ])
@@ -113,7 +113,7 @@ export function TerminalContact() {
     if (!command) return
 
     const push = (...lines: string[]) =>
-      setHistory((p) => [...p, `sumeet@nexus:~$ ${command}`, ...lines, ''])
+      setHistory((p) => [...p, `sumeet@portfolio:~$ ${command}`, ...lines, ''])
 
     switch (command) {
       case 'help':
@@ -123,7 +123,7 @@ export function TerminalContact() {
         push(LS_TEXT)
         break
       case 'whoami':
-        push('Sumeet Kanhiya — Full Stack Developer (PERN Stack)', 'DUET, Karachi · Open to opportunities globally.')
+        push('Sumeet Kanhiya — Full Stack Developer (PERN / MERN)', 'DUET, Karachi · Open to opportunities globally.')
         break
       case 'contact':
         push('Switching to GUI form mode...', '→ Use the Form tab for a guided contact experience.')
@@ -321,7 +321,7 @@ export function TerminalContact() {
                     <div
                       key={`line-${i}-${line.length}`}
                       className={`${
-                        line.startsWith('sumeet@nexus')
+                        line.startsWith('sumeet@portfolio')
                           ? 'text-primary'
                           : line.startsWith('Command not found')
                             ? 'text-destructive'
@@ -337,7 +337,7 @@ export function TerminalContact() {
                 {/* Input */}
                 <form onSubmit={handleCmd} className="flex items-center gap-2 rounded-xl border border-border bg-[#0d0d14] px-4 py-3">
                   <span className="font-mono text-xs text-primary select-none">
-                    sumeet@nexus:~$
+                    sumeet@portfolio:~$
                   </span>
                   <input
                     value={cmd}

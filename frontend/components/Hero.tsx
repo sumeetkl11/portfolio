@@ -116,7 +116,7 @@ export function Hero() {
 
           <motion.p
             variants={item}
-            className="mt- max-w-md text-lg leading-relaxed text-muted-foreground md:text-x10"
+            className="mt-4 max-w-md text-lg leading-relaxed text-muted-foreground md:text-xl"
           >
             I build things that are{' '}
             <span className="font-semibold text-foreground">fast, real-time, and memorable</span>—from
@@ -147,7 +147,7 @@ export function Hero() {
             variants={item}
             className="mt-4 text-xs font-mono text-muted-foreground/85"
           >
-            ⚡ Available for full-stack or backend roles starting July 2026.
+            ⚡ Available for full-stack or backend roles.
           </motion.p>
 
           {/* Social links */}

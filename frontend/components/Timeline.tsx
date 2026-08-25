@@ -12,27 +12,27 @@ interface TimelineEntry {
 
 const ENTRIES: TimelineEntry[] = [
   {
+    period:       'Mar 2025 — Jun 2025',
+    title:        'Backend Developer — ChefCraft',
+    organization: 'Production Project',
+    description:
+      'Engineered 25+ RESTful API endpoints using Node.js & Express.js. Integrated Google Gemini API with structured prompt design and multi-tier model fallbacks, achieving deterministic JSON output schemas with sub-2s generation latency.',
+    type: 'work',
+  },
+  {
     period:       'Dec 2024 — Present',
-    title:        'Freelance Full Stack Developer',
+    title:        'Freelance Web Developer',
     organization: 'Independent Clients',
     description:
-      'Delivered 3 full-stack client web applications (under NDA) using Next.js, Express, Node.js, and PostgreSQL. Engineered secure authentication mechanisms, responsive user dashboards, and structured RESTful APIs.',
+      'Delivered 2+ end-to-end full-stack web applications for clients across SaaS, e-commerce, and content platforms using Agile/Scrum sprint cycles. Architected performance-optimized, responsive frontends with React and Tailwind CSS.',
     type: 'work',
   },
   {
-    period:       'Mar 2025 — Jun 2025',
-    title:        'Backend Developer — Tastebuds AI',
-    organization: 'Personal Project',
-    description:
-      'Architected the core Express.js + PostgreSQL backend for the Tastebuds AI platform. Integrated Google Gemini API with structured JSON schema output for deterministic meal-plan generation.',
-    type: 'work',
-  },
-  {
-    period:       '2024 — Expected Dec 2028',
-    title:        'B.E. in Computer Engineering',
+    period:       'Nov 2024 — Dec 2028 (Expected)',
+    title:        'B.S. in Computer Science',
     organization: 'Dawood University of Engineering & Technology (DUET), Karachi',
     description:
-      'Core curriculum: Database Management Systems, Software Engineering, Computer Networks, and Algorithms. Focus on scalable system design and modern full-stack web development.',
+      'Relevant Projects: Linkforge, Sock.io, ChefCraft. Core Coursework: Database Management Systems, Software Engineering, Computer Networks, Data Structures & Algorithms.',
     type: 'education',
   },
 ]

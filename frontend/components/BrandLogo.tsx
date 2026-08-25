@@ -118,7 +118,7 @@ export function BrandLogo() {
       </div>
 
       {/* Brand Text styling next to logo */}
-      <span className="font-display text-x8 md:text-x5 font-extrabold tracking-tight text-white transition-colors duration-300 group-hover:text-slate-100">
+      <span className="font-display text-lg md:text-xl font-extrabold tracking-tight text-white transition-colors duration-300 group-hover:text-slate-100">
         Sumeet Kanhiya
         <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#60A5FA] to-[#8B5CF6] transition-all duration-300 group-hover:scale-110">
           .

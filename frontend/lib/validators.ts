@@ -7,7 +7,7 @@ export const contactSchema = z.object({
     .min(2,  { message: 'Name must be at least 2 characters.' })
     .max(100, { message: 'Name must be 100 characters or fewer.' })
     .trim()
-    .refine((v) => /^[\p{L}\p{M}'\s-]+$/u.test(v), {
+    .refine((v) => /^[\p{L}\p{M}' -]+$/u.test(v), {
       message: 'Name contains invalid characters.',
     }),
 
@@ -34,5 +34,6 @@ export function sanitizeText(input: string): string {
     .replace(/<[^>]*>/g, '')        // strip HTML tags
     .replace(/javascript:/gi, '')   // strip JS URIs
     .replace(/on\w+=/gi, '')        // strip event handlers
+    .replace(/[\r\n]+/g, ' ')       // collapse header/log injection characters
     .trim()
 }
