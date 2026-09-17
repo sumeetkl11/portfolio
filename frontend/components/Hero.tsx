@@ -3,51 +3,57 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Github, Linkedin, Mail, FileText } from 'lucide-react'
+import { Github, Linkedin, Mail, FileText, MapPin } from 'lucide-react'
 import { GITHUB_URL, LINKEDIN_URL, EMAIL } from '@/lib/constants'
 import { useCopyToClipboard } from '@/lib/hooks/useCopyToClipboard'
+import { TactileLink } from './ui/TactileButton'
+import { MagneticButton, magneticButtonPrimary, magneticButtonSecondary } from './ui/MagneticButton'
+import { CursorOrb } from './CursorOrb'
+import { staggerContainer, fadeUpItem } from '@/lib/motion'
 
-/* ── Profile image with error fallback ────────────────────────── */
+/* ── Profile image ──────────────────────────────────────────── */
 function ProfileImage() {
   const [imgError, setImgError] = useState(false)
   const shouldReduceMotion = useReducedMotion()
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
-      className="order-1 flex justify-center md:order-2"
+      variants={fadeUpItem}
+      className="relative flex h-full w-full items-center justify-center md:pt-10"
     >
-      {/* 1. Parent Container: Needs top margin to give the head room to pop out */}
       <motion.div
         animate={shouldReduceMotion ? undefined : { y: [0, -14, 0] }}
-        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-        className="relative w-72 h-80 md:w-90 md:h-100 mt-15 mx-auto"
+        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+        className="relative h-[280px] md:h-[400px] w-full max-w-[280px] md:max-w-[340px]"
       >
-        {/* 2. The Glowing Background Box (Z-index 0) */}
-        <div className="absolute inset-0 z-0 rounded-2xl border-2 border-violet-500/50 bg-gradient-to-b from-slate-900/80 to-slate-900/20 shadow-[0_0_30px_rgba(138,43,226,0.3)] backdrop-blur-sm"></div>
+        {/* Frosted glass container with edge lighting */}
+        <div className="absolute inset-0 z-0 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+          {/* Removed static radial glow blobs for Pure Void aesthetic */}
+        </div>
 
-        {/* 3. The Image Wrapper (Z-index 10) / Fallback */}
+        {/* Profile Image (overflowing top rim) */}
         {imgError ? (
-          /* Fallback: stylised initials avatar — shown if image file is missing */
-          <div
-            className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl border border-border bg-gradient-to-br from-primary/20 to-accent/20"
-            role="img"
-            aria-label="Sumeet Kanhiya — avatar placeholder"
-          >
-            <span className="font-display text-7xl font-bold gradient-text select-none">
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl">
+            <span
+              className="gradient-text select-none"
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'clamp(4rem, 8vw, 6rem)',
+                fontWeight: 700,
+                letterSpacing: '-0.04em',
+              }}
+            >
               SK
             </span>
           </div>
         ) : (
-          <div className="absolute bottom-[-15px] left-1 w-full h-[125%] z-10">
+          <div className="absolute bottom-0 left-0 w-full h-[120%] z-10">
             <Image
-              src="/sumeet-profile.png" // MUST be the transparent background PNG
+              src="/sumeet-profile.png"
               alt="Sumeet Kanhiya"
               fill
-              sizes="(max-width: 768px) 288px, 320px"
-              className="object-contain object-bottom drop-shadow-[0_0_15px_rgba(138,43,226,0.5)]"
+              sizes="(max-width: 768px) 288px, 340px"
+              className="object-contain object-bottom drop-shadow-2xl"
               priority
               onError={() => setImgError(true)}
             />
@@ -58,129 +64,147 @@ function ProfileImage() {
   )
 }
 
-/* ── Animation variants ───────────────────────────────────────── */
-const container = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.1, delayChildren: 0.15 },
-  },
-}
-const item = {
-  hidden:  { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const } },
-}
-
-const socials = [
-  { icon: Github,   href: GITHUB_URL,   label: 'GitHub'   },
-  { icon: Linkedin, href: LINKEDIN_URL, label: 'LinkedIn' },
-  { icon: Mail,     href: `mailto:${EMAIL}`, label: 'Email' },
-  { icon: FileText, href: '/resume', label: 'Resume' },
-]
-
 /* ── Hero section ─────────────────────────────────────────────── */
 export function Hero() {
   const { copied, copyToClipboard } = useCopyToClipboard()
 
-  const handleSocialClick = (e: React.MouseEvent<HTMLAnchorElement>, label: string, href: string) => {
+  const handleSocialClick = (e: React.MouseEvent<HTMLAnchorElement>, label: string) => {
     if (label === 'Email') {
       e.preventDefault()
       copyToClipboard(EMAIL)
     }
   }
 
+  const socials = [
+    { icon: Github,   href: GITHUB_URL,         label: 'GitHub'   },
+    { icon: Linkedin, href: LINKEDIN_URL,        label: 'LinkedIn' },
+    { icon: Mail,     href: `mailto:${EMAIL}`,   label: 'Email'    },
+    { icon: FileText, href: '/resume',           label: 'Resume'   },
+  ]
+
   return (
-    <section
-      id="hero"
-      className="relative flex min-h-screen items-center justify-center px-6 pt-24"
-    >
-      <div className="mx-auto grid w-full max-w-6xl items-center gap-12 md:grid-cols-2 md:gap-8">
-        {/* Left: text content */}
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="visible"
-          className="order-2 text-center md:order-1 md:text-left"
-        >
-          <motion.p variants={item} className="mb-2 text-lg text-muted-foreground">
-            Hi, I&apos;m
+    <section id="hero" className="relative flex min-h-screen items-center px-6 pt-28 pb-20 overflow-hidden">
+      {/* Gamified cursor orb — renders globally, behind everything */}
+      <CursorOrb />
+
+      {/* Asymmetric split grid (58% / 42%) */}
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[58fr_42fr]"
+      >
+        {/* ── Left: Text Content ─────────────────────────────────── */}
+        <div className="flex flex-col text-left">
+
+          {/* Section label — label-caps style */}
+          <motion.p
+            variants={fadeUpItem}
+            className="text-label-caps mb-5 text-muted-foreground"
+          >
+            {'// 01_SYSTEMS_ARCHITECT'}
           </motion.p>
 
+          {/* ── HERO HEADLINE — Stitch display-hero: 4.5rem / 700 / -0.04em ── */}
           <motion.h1
-            variants={item}
-            className="font-display text-5xl font-bold leading-tight tracking-tight text-foreground sm:text-6xl lg:text-7xl"
+            variants={fadeUpItem}
+            className="text-hero text-foreground"
           >
             Sumeet
             <br />
             <span className="gradient-text">Kanhiya.</span>
           </motion.h1>
 
-          <motion.p
-            variants={item}
-            className="mt-4 max-w-md text-lg leading-relaxed text-muted-foreground md:text-xl"
-          >
-            I build things that are{' '}
-            <span className="font-semibold text-foreground">fast, real-time, and memorable</span>—from
-            WebSocket platforms to Edge-deployed APIs and WebGL graphics.
-          </motion.p>
-
-          {/* CTA buttons */}
+          {/* ── Role & Identity line ──────────────────────────────── */}
           <motion.div
-            variants={item}
-            className="mt-8 flex flex-col items-center gap-4 sm:flex-row md:items-start"
+            variants={fadeUpItem}
+            className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2"
           >
-            <a
-              href="#projects"
-              className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-primary to-accent px-6 py-3 text-center font-semibold text-background transition-all duration-300 hover:shadow-[0_0_32px_oklch(0.73_0.155_232_/_40%)] sm:w-auto"
+            <span
+              className="font-mono text-base text-muted-foreground"
+              style={{ letterSpacing: '-0.01em' }}
             >
-              <span className="relative z-10">View My Projects</span>
-              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-accent to-primary transition-transform duration-500 group-hover:translate-x-0" />
-            </a>
-            <a
-              href="#contact"
-              className="w-full rounded-xl border border-border bg-input px-6 py-3 text-center font-medium text-foreground backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:bg-primary/5 sm:w-auto"
+              Full-Stack Developer
+            </span>
+            <span className="text-white/20 font-mono">·</span>
+            <span
+              className="font-mono text-base text-muted-foreground"
+              style={{ letterSpacing: '-0.01em' }}
             >
-              Let&apos;s Build Something
-            </a>
+              CS Student @ DUET
+            </span>
           </motion.div>
 
-          <motion.p
-            variants={item}
-            className="mt-4 text-xs font-mono text-muted-foreground/85"
+          {/* ── Location badge ────────────────────────────────────── */}
+          <motion.div
+            variants={fadeUpItem}
+            className="mt-3 flex items-center gap-1.5"
           >
-            ⚡ Available for full-stack or backend roles.
+            <MapPin className="h-3.5 w-3.5 text-primary/60" />
+            <span className="text-label-code text-primary/60 uppercase tracking-widest">
+              Karachi, Pakistan
+            </span>
+          </motion.div>
+
+          {/* ── Bio ───────────────────────────────────────────────── */}
+          <motion.p
+            variants={fadeUpItem}
+            className="mt-8 max-w-[500px] font-mono text-base leading-relaxed text-muted-foreground"
+            style={{ letterSpacing: '-0.01em' }}
+          >
+            I build distributed systems and high-throughput web applications
+            using the PERN stack, Next.js, and AI integrations (Gemini API,
+            Groq). No boilerplate — just resilient infrastructure and
+            precise interfaces.
           </motion.p>
 
-          {/* Social links */}
+          {/* ── Magnetic CTA Buttons ──────────────────────────────── */}
           <motion.div
-            variants={item}
-            className="mt-8 flex items-center justify-center gap-5 md:justify-start"
+            variants={fadeUpItem}
+            className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center"
+          >
+            <MagneticButton href="#projects" className={magneticButtonPrimary}>
+              Inspect Architecture
+            </MagneticButton>
+            <MagneticButton href="#contact" className={magneticButtonSecondary}>
+              Get in Touch
+            </MagneticButton>
+          </motion.div>
+
+          {/* ── Social icons row ──────────────────────────────────── */}
+          <motion.div
+            variants={fadeUpItem}
+            className="mt-12 flex items-center gap-6"
           >
             {socials.map(({ icon: Icon, href, label }) => (
               <div key={label} className="relative">
-                <a
+                <TactileLink
                   href={href}
-                  onClick={(e) => handleSocialClick(e, label, href)}
+                  onClick={(e) => handleSocialClick(e, label)}
                   target={label !== 'Email' ? '_blank' : undefined}
                   rel={label !== 'Email' ? 'noopener noreferrer' : undefined}
                   aria-label={label}
-                  className="text-muted-foreground transition-all duration-300 hover:scale-110 hover:text-primary block"
+                  className="flex items-center justify-center h-11 w-11 -m-2 text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <Icon className="h-5 w-5" />
-                </a>
+                </TactileLink>
                 {label === 'Email' && copied && (
-                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-primary px-2 py-0.5 text-[10px] font-medium text-background shadow-md transition-all duration-300">
+                  <motion.span
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2.5 py-1 font-mono text-[11px] font-medium text-background"
+                  >
                     Copied!
-                  </span>
+                  </motion.span>
                 )}
               </div>
             ))}
           </motion.div>
-        </motion.div>
+        </div>
 
-        {/* Right: profile image */}
+        {/* ── Right: Portrait Container ──────────────────────────── */}
         <ProfileImage />
-      </div>
-
+      </motion.div>
     </section>
   )
 }

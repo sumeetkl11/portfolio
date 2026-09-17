@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { staggerContainer, fadeUpItem } from '@/lib/motion'
 
 interface TimelineEntry {
   period:       string
@@ -39,23 +40,26 @@ const ENTRIES: TimelineEntry[] = [
 
 export function Timeline() {
   return (
-    <section id="experience" className="relative px-6 py-24 md:py-32">
-      <div className="mx-auto max-w-3xl">
-        {/* Section header */}
+    <section id="experience" className="relative px-6 section-padding">
+      <div className="mx-auto max-w-4xl">
+        {/* Anti-Slop: Left-aligned header */}
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-16 text-center"
+          className="mb-16 text-left"
         >
-          {/* <p className="mb-3 font-mono text-sm uppercase tracking-widest text-primary">
-            {'// 02. Journey'}
-          </p> */}
-          <h2 className="font-display text-4xl font-bold text-foreground md:text-5xl">
-            Experience & Education
+          <h2 className="font-display text-3xl font-extrabold tracking-tight leading-tight text-foreground sm:text-4xl md:text-5xl lg:text-6xl">
+            Experience & Education.
           </h2>
-          <div className="mx-auto mt-4 h-px w-20 bg-gradient-to-r from-primary to-accent" />
+          <div className="mt-6 h-px w-32 bg-gradient-to-r from-primary to-accent" />
+          <p className="mt-4 font-mono text-xs tracking-widest text-primary/60 uppercase">
+            03_JOURNEY
+          </p>
+          <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted-foreground">
+            Where I've been and what I've learned.
+          </p>
         </motion.div>
 
         {/* Timeline */}
@@ -63,16 +67,19 @@ export function Timeline() {
           {/* Vertical line */}
           <div className="absolute left-4 top-0 h-full w-px bg-gradient-to-b from-primary/60 via-accent/30 to-transparent md:left-1/2 md:-translate-x-1/2" />
 
-          <div className="space-y-12">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-40px' }}
+            className="space-y-12"
+          >
             {ENTRIES.map((entry, i) => {
               const isLeft = i % 2 === 0
               return (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 28 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-40px' }}
-                  transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  variants={fadeUpItem}
                   className={`relative pl-12 md:w-1/2 md:pl-0 ${
                     isLeft ? 'md:pr-10 md:text-right' : 'md:ml-auto md:pl-10'
                   }`}
@@ -107,7 +114,7 @@ export function Timeline() {
                 </motion.div>
               )
             })}
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

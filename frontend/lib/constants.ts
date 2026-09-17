@@ -10,9 +10,9 @@ export const EMAIL           = 'sumeetkanhiya11@gmail.com'
 export const SITE_URL        = 'https://sumeetkanhiya.dev'
 
 export const FULL_NAME   = 'Sumeet Kanhiya'
-export const TITLE       = `${FULL_NAME} — Full Stack Developer (PERN / MERN) | Software Engineer`
+export const TITLE       = `${FULL_NAME} — Luxury Portfolio & Systems Architect`
 export const DESCRIPTION =
-  'Results-driven Full Stack Software Engineer specializing in the PERN and MERN stacks. Experienced in designing scalable RESTful APIs, low-latency real-time distributed systems, and integrating AI workflows.'
+  'Full-Stack Developer & CS student at Dawood University of Engineering & Technology (DUET), Karachi. Specializing in PERN stack, Next.js, AI integrations (Gemini API, Groq), and Kotlin/Jetpack Compose. Building resilient systems and precise interfaces.'
 
 export const NAV_LINKS = [
   { label: 'About',      href: '#hero'       },

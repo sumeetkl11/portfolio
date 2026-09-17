@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Volume2, VolumeX } from 'lucide-react'
 import { NAV_LINKS } from '@/lib/constants'
 import { BrandLogo } from './BrandLogo'
+import { useAudioStore } from '@/lib/hooks/useAudioStore'
 
 export function Navbar() {
   const [scrolled,  setScrolled]  = useState(false)
   const [menuOpen,  setMenuOpen]  = useState(false)
+  const { muted, toggleMute } = useAudioStore()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -40,7 +42,7 @@ export function Navbar() {
           <BrandLogo />
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-4 lg:gap-6">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
@@ -51,12 +53,23 @@ export function Navbar() {
                 <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-gradient-to-r from-primary to-accent transition-all duration-300 group-hover:w-full" />
               </a>
             ))}
-            
 
+            {/* Doc 06: Global mute toggle — always visible in nav */}
+            <button
+              onClick={toggleMute}
+              aria-label={muted ? 'Unmute sound effects' : 'Mute sound effects'}
+              title={muted ? 'Unmute' : 'Mute'}
+              className="text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
+            >
+              {muted
+                ? <VolumeX className="h-4 w-4" />
+                : <Volume2  className="h-4 w-4" />
+              }
+            </button>
 
             <a
               href="#contact"
-              className="rounded-lg border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-all duration-300 hover:bg-primary/20 hover:shadow-[0_0_20px_oklch(0.73_0.155_232_/_30%)]"
+              className="whitespace-nowrap rounded-lg border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-all duration-300 hover:bg-primary/20 hover:shadow-[0_0_20px_oklch(0.73_0.155_232_/_30%)]"
             >
               Get in Touch
             </a>
@@ -87,13 +100,26 @@ export function Navbar() {
               <span className="font-display text-lg font-bold text-foreground">
                 Sumeet<span className="text-primary">.</span>
               </span>
-              <button
-                onClick={() => setMenuOpen(false)}
-                className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                aria-label="Close navigation menu"
-              >
-                <X className="h-6 w-6" />
-              </button>
+              <div className="flex items-center gap-4">
+                {/* Doc 06: Mute toggle inside mobile menu too */}
+                <button
+                  onClick={toggleMute}
+                  aria-label={muted ? 'Unmute sound effects' : 'Mute sound effects'}
+                  className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                >
+                  {muted
+                    ? <VolumeX className="h-5 w-5" />
+                    : <Volume2  className="h-5 w-5" />
+                  }
+                </button>
+                <button
+                  onClick={() => setMenuOpen(false)}
+                  className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                  aria-label="Close navigation menu"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
             </div>
 
             <nav className="flex flex-col items-center justify-center gap-10 pt-16">
@@ -104,14 +130,12 @@ export function Navbar() {
                   onClick={() => setMenuOpen(false)}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.08 + i * 0.07 }}
+                  transition={{ delay: 0.08 + i * 0.08 }} /* Doc 02: 0.08 stagger */
                   className="font-display text-3xl font-semibold text-muted-foreground transition-colors hover:text-primary"
                 >
                   {link.label}
                 </motion.a>
               ))}
-
-
             </nav>
           </motion.div>
         )}

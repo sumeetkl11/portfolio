@@ -1,7 +1,8 @@
 /* ─────────────────────────────────────────────────────────────
-   The Digital Nexus — Global Styles
+   Sumeet Kanhiya — Luxury Portfolio & Systems Architect
    Framework : Tailwind CSS v4
-   Color model: oklch for perceptually uniform gradients
+   Typography: Inter (display/headlines) + JetBrains Mono (body/labels)
+   Source    : Stitch "Dark Bento Developer Portfolio" design system
 ───────────────────────────────────────────────────────────── */
 @import 'tailwindcss';
 @import 'tw-animate-css';
@@ -27,9 +28,14 @@
   --color-input:           var(--input);
   --color-ring:            var(--ring);
   --color-glow:            var(--glow);
-  --font-sans:    var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif;
-  --font-display: var(--font-syne), 'Syne', 'Space Grotesk', sans-serif;
+
+  /* ── Stitch Design System Fonts ─────────────────────────────
+     display/headlines → Inter (tightly-tracked)
+     body/labels       → JetBrains Mono (technical, developer-first) */
+  --font-display: var(--font-inter), 'Inter', system-ui, sans-serif;
+  --font-sans:    var(--font-inter), 'Inter', system-ui, sans-serif;
   --font-mono:    var(--font-jetbrains-mono), 'JetBrains Mono', monospace;
+
   --radius-sm:  calc(var(--radius) * 0.6);
   --radius-md:  calc(var(--radius) * 0.8);
   --radius-lg:  var(--radius);
@@ -41,24 +47,24 @@
 :root {
   color-scheme: dark;
 
-  /* Deep-space charcoal */
-  --background:            oklch(0.13 0.025 275);
+  /* Deep-space obsidian — Stitch "surface: #131315" equivalent */
+  --background:            oklch(0.11 0.012 280);
   --foreground:            oklch(0.96 0.006 260);
 
   /* Glassmorphic card */
-  --card:                  oklch(0.17 0.025 270 / 55%);
+  --card:                  oklch(0.14 0.018 270 / 55%);
   --card-foreground:       oklch(0.96 0.006 260);
 
   /* Electric blue — primary CTA */
   --primary:               oklch(0.73 0.155 232);
-  --primary-foreground:    oklch(0.13 0.025 275);
+  --primary-foreground:    oklch(0.11 0.012 280);
 
   /* Quiet neutral layer */
-  --secondary:             oklch(0.22 0.032 270);
+  --secondary:             oklch(0.20 0.025 270);
   --secondary-foreground:  oklch(0.96 0.006 260);
 
-  --muted:                 oklch(0.22 0.032 270);
-  --muted-foreground:      oklch(0.66 0.025 260);
+  --muted:                 oklch(0.20 0.025 270);
+  --muted-foreground:      oklch(0.60 0.020 260);
 
   /* Neon violet — accent / hover */
   --accent:                oklch(0.60 0.20 292);
@@ -67,8 +73,8 @@
   --destructive:           oklch(0.60 0.21 25);
 
   /* Borders & inputs */
-  --border:                oklch(0.96 0.006 260 / 10%);
-  --input:                 oklch(0.96 0.006 260 / 14%);
+  --border:                oklch(0.96 0.006 260 / 8%);
+  --input:                 oklch(0.96 0.006 260 / 12%);
   --ring:                  oklch(0.73 0.155 232);
 
   /* Glow color for neon effects */
@@ -89,8 +95,12 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground font-mono antialiased;
     overflow-x: hidden;
+  }
+
+  main {
+    overflow-x: clip;
   }
 
   ::selection {
@@ -101,12 +111,84 @@
 
 /* ── Utility classes ─────────────────────────────────────────── */
 @layer utilities {
+
+  /* ── Stitch typography: hero text (display-hero token) ──────
+     4.5rem / 700 / -0.04em — dominates the viewport           */
+  .text-hero {
+    font-family: var(--font-display);
+    font-size: clamp(3.25rem, 9vw + 0.5rem, 6.5rem);
+    font-weight: 700;
+    line-height: 1.0;
+    letter-spacing: -0.04em;
+  }
+
+  /* ── Section headline (headline-xl token: 3rem / 600 / -0.03em) */
+  .text-section-xl {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  /* ── Sub-headline (headline-lg: 2rem / 600 / -0.02em) */
+  .text-headline-lg {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  /* ── Caps label (label-caps: 0.6875rem / 600 / +0.08em) */
+  .text-label-caps {
+    font-family: var(--font-display);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── Code label (label-code: 0.75rem / 500 / +0.05em) */
+  .text-label-code {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.05em;
+  }
+
   /* Glassmorphism base card */
   .glass {
     background: var(--card);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  /* 2× Whitespace Rule */
+  .section-padding {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+  @media (min-width: 768px) {
+    .section-padding {
+      padding-top: 8rem;
+      padding-bottom: 8rem;
+    }
+  }
+
+  /* Frosted glass card (for project cards) */
+  .frosted-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      0 20px 40px rgba(0, 0, 0, 0.35);
   }
 
   /* Gradient text: blue → violet */
@@ -124,7 +206,7 @@
       drop-shadow(0 0 64px oklch(0.73 0.155 232 / 30%));
   }
 
-  /* Glow pulse on interactive elements */
+  /* Glow effects */
   .glow-blue {
     box-shadow:
       0 0 20px oklch(0.73 0.155 232 / 40%),
@@ -142,11 +224,68 @@
     font-size: 0.8125rem;
     line-height: 1.6;
   }
+
+  /* ── Marquee tracks ──────────────────────────────────────────
+     Used by TechMarquee. Two rows scroll in opposite dirs.     */
+  .marquee-viewport {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    );
+  }
+
+  .marquee-track {
+    display: flex;
+    gap: 0;
+    white-space: nowrap;
+    will-change: transform;
+  }
+
+  .marquee-track--left {
+    animation: marquee-left 35s linear infinite;
+  }
+
+  .marquee-track--right {
+    animation: marquee-right 28s linear infinite;
+  }
+
+  /* ── Bento card mouse glow ───────────────────────────────────
+     The glow position is driven by CSS custom properties       */
+  .bento-glow-layer {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      oklch(0.73 0.155 232 / 12%) 0%,
+      oklch(0.60 0.20 292 / 6%) 40%,
+      transparent 70%
+    );
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .bento-card-wrapper:hover .bento-glow-layer {
+    opacity: 1;
+  }
 }
 
 /* ── Custom scrollbar ────────────────────────────────────────── */
 ::-webkit-scrollbar         { width: 6px; }
-::-webkit-scrollbar-track   { background: oklch(0.13 0.025 275); }
+::-webkit-scrollbar-track   { background: oklch(0.11 0.012 280); }
 ::-webkit-scrollbar-thumb   {
   background: linear-gradient(180deg, oklch(0.73 0.155 232), oklch(0.60 0.20 292));
   border-radius: 3px;
@@ -155,14 +294,25 @@
   background: linear-gradient(180deg, oklch(0.80 0.14 232), oklch(0.68 0.18 292));
 }
 
-/* ── Animation: scroll-pulse (scroll indicator) ─────────────── */
+/* ── Anti-parallel marquee keyframes ─────────────────────────── */
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
+/* ── Animation: scroll-pulse ─────────────────────────────────── */
 @keyframes scroll-pulse {
   0%, 100% { transform: translateY(0);  opacity: 1; }
   50%       { transform: translateY(6px); opacity: 0.4; }
 }
 .animate-scroll-pulse { animation: scroll-pulse 1.8s ease-in-out infinite; }
 
-/* ── Animation: float (hero portrait) ───────────────────────── */
+/* ── Animation: float-portrait ───────────────────────────────── */
 @keyframes float-portrait {
   0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-14px); }
@@ -182,6 +332,8 @@
   html { scroll-behavior: auto; }
   .animate-scroll-pulse { animation: none; }
   .animate-spin-slow { animation: none; }
+  .marquee-track--left,
+  .marquee-track--right { animation: none; }
 }
 
 /* ── Print stylesheet — clean single-page A4 resume ──────────── */
@@ -191,7 +343,6 @@
     margin: 8mm 10mm;
   }
 
-  /* Swap the entire dark palette to a clean document theme */
   :root {
     --background:            #ffffff;
     --foreground:            #111111;
@@ -219,7 +370,6 @@
     print-color-adjust: exact;
   }
 
-  /* Kill all decorative effects */
   * {
     box-shadow: none !important;
     text-shadow: none !important;
@@ -227,19 +377,16 @@
     -webkit-backdrop-filter: none !important;
   }
 
-  /* Hide elements not needed in resume PDF */
   .print-hidden {
     display: none !important;
   }
 
-  /* The glass utility: flatten for print */
   .glass {
     background: white !important;
     backdrop-filter: none !important;
     border: none !important;
   }
 
-  /* Gradient text: just use primary color */
   .gradient-text {
     background: none !important;
     -webkit-background-clip: unset !important;
@@ -248,11 +395,9 @@
     color: var(--primary) !important;
   }
 
-  /* Prevent content from breaking mid-section */
   section { break-inside: avoid; }
   h2, h3  { break-after: avoid; }
 
-  /* Tighten spacing for one-page fit */
   .resume-print-tight h2 { font-size: 0.8rem !important; margin-bottom: 0.25rem !important; }
   .resume-print-tight p,
   .resume-print-tight li { font-size: 0.7rem !important; line-height: 1.45 !important; }
