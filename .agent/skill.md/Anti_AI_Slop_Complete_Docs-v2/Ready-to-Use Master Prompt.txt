@@ -1,0 +1,6 @@
+"Antigravity, follow our complete Anti_AI_Slop_Docs/ rulebook:
+1. Plan structure using 01_fundamentals (asymmetric layout, heavy whitespace) and copy from 09_copywriting (no buzzwords).
+2. Implement base elements with 04_shadcn and animated highlights with 03_premium_libraries.
+3. Apply physical depth via 07_noise_shaders and tactile clicks via 06_audio.
+4. Animate interactions using 02_animations.
+5. Finally, run visual QA following 08_responsive_qa across mobile (375px) and desktop (1440px) to verify zero overflow or layout breakage."
