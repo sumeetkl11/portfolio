@@ -30,17 +30,6 @@ export default function ProfileHero() {
         }
       );
 
-      // Scroll-driven marquee
-      gsap.to(marqueeRef.current, {
-        xPercent: -50,
-        ease: "none",
-        scrollTrigger: {
-          trigger: document.documentElement,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 1,
-        },
-      });
     }, sectionRef);
 
     return () => ctx.revert();
@@ -54,7 +43,7 @@ export default function ProfileHero() {
     "GEMINI API & AI INTEGRATIONS",
     "POSTGRESQL & REDIS",
     "HIGH-THROUGHPUT ARCHITECTURE",
-    "CS @ DUET",
+
   ];
 
   return (
@@ -65,7 +54,7 @@ export default function ProfileHero() {
     >
       {/* Main Hero Content Container - Full Width Edge to Edge */}
       <div className="w-full flex-1 flex flex-col lg:flex-row items-center justify-between px-6 sm:px-10 md:px-16 lg:px-20 xl:px-28 pt-28 pb-12 lg:py-24 relative z-20">
-        
+
         {/* Left Column: Typography & CTAs */}
         <div className="w-full lg:max-w-2xl xl:max-w-3xl flex flex-col items-start z-30">
           {/* Tagline / Subheading */}
@@ -125,7 +114,7 @@ export default function ProfileHero() {
         {/* Right Column: Large Character Image Seamlessly Blended */}
         <div className="w-full lg:w-1/2 lg:h-[82vh] relative mt-12 lg:mt-0 flex items-end justify-center lg:justify-end pointer-events-none z-10">
           <div className="relative w-full max-w-[580px] h-[450px] sm:h-[550px] md:h-[650px] lg:h-full flex items-end justify-center lg:justify-end">
-            
+
             {/* Sumeet's High-Res Portrait */}
             <Image
               src="/sumeet-hero.jpg"
@@ -139,13 +128,13 @@ export default function ProfileHero() {
             {/* Seamless Black Edge Fades (No Box, No Seam) */}
             {/* Bottom Fade - melts torso directly into the dark floor */}
             <div className="absolute bottom-0 inset-x-0 h-36 md:h-52 bg-gradient-to-t from-black via-black/85 to-transparent pointer-events-none z-20" />
-            
+
             {/* Left Edge Fade - dissolves shadow side of portrait into the void */}
             <div className="absolute inset-y-0 left-0 w-32 md:w-48 bg-gradient-to-r from-black via-black/75 to-transparent pointer-events-none z-20" />
-            
+
             {/* Top Fade - softens hair boundary */}
             <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-black/80 via-black/30 to-transparent pointer-events-none z-20" />
-            
+
             {/* Right Fade - ensures seamless right screen boundary */}
             <div className="absolute inset-y-0 right-0 w-16 md:w-24 bg-gradient-to-l from-black/60 to-transparent pointer-events-none z-20" />
           </div>
@@ -154,7 +143,7 @@ export default function ProfileHero() {
 
       {/* Bottom Ticker / Ribbon - Scroll Driven (Full Width) */}
       <div className="w-full relative z-30 bg-zinc-900 text-white py-2.5 overflow-hidden border-y border-white/10 shadow-lg shadow-black/40">
-        <div ref={marqueeRef} className="flex whitespace-nowrap min-w-max">
+        <div ref={marqueeRef} className="flex whitespace-nowrap min-w-max animate-marquee">
           {[...marqueeSkills, ...marqueeSkills, ...marqueeSkills, ...marqueeSkills].map((skill, index) => (
             <span
               key={index}
