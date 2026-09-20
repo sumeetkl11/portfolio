@@ -21,6 +21,11 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Force hide system cursor for custom cursor implementation */
+  *, *::before, *::after, a, button, input, textarea, select {
+    cursor: none !important;
+  }
+
   /* Lenis recommended CSS */
   html.lenis, html.lenis body {
     height: auto;

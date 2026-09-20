@@ -4,6 +4,7 @@ import "./globals.css";
 import SmoothScroll from "@/components/layout/SmoothScroll";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import CustomCursor from "@/components/ui/CustomCursor";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -27,7 +28,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${cinzel.variable} font-sans antialiased bg-black text-white selection:bg-white/30`}>
+      <body className={`${inter.variable} ${cinzel.variable} font-sans antialiased bg-black text-white selection:bg-white/30 cursor-none`}>
+        <CustomCursor />
         <SmoothScroll>
           <Navbar />
           {children}
