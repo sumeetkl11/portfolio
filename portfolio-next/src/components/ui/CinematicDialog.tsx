@@ -142,7 +142,7 @@ export default function CinematicDialog({ project, isOpen, onClose }: CinematicD
               <div>
                 <h3 className="text-sm font-mono text-zinc-500 uppercase tracking-widest mb-4">Tech Stack</h3>
                 <div className="flex flex-wrap gap-2">
-                  {internalProject.techStack.map((tech) => (
+                  {internalProject.techStack.map((tech: string) => (
                     <span key={tech} className="text-xs uppercase font-mono tracking-wider px-3 py-1.5 rounded-full bg-white/5 text-zinc-300 border border-white/10">
                       {tech}
                     </span>

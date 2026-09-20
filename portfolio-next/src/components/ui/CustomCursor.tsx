@@ -9,39 +9,82 @@ export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const cursorTextRef = useRef<HTMLDivElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
-  const [isHovering, setIsHovering] = useState(false);
   const [hoverText, setHoverText] = useState("");
+  const isHoveringRef = useRef(false);
+  const isVisibleRef = useRef(false);
   const pathname = usePathname();
 
   useEffect(() => {
+    // Don't activate on touch / mobile devices
+    if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) {
+      return;
+    }
+
     const cursor = cursorRef.current;
     const cursorDot = cursorDotRef.current;
     const cursorText = cursorTextRef.current;
 
     if (!cursor || !cursorDot || !cursorText) return;
 
-    // Set initial position
-    gsap.set(cursor, { xPercent: -50, yPercent: -50 });
+    // Set initial position & hide cursor until mouse enters
+    gsap.set(cursor, {
+      xPercent: -50,
+      yPercent: -50,
+      opacity: 0,
+      scale: 0.4,
+      width: 48,
+      height: 48,
+      backgroundColor: "transparent",
+      mixBlendMode: "difference",
+    });
 
     // GSAP quickTo for highly performant tracking
     const xTo = gsap.quickTo(cursor, "x", { duration: 0.2, ease: "power3" });
     const yTo = gsap.quickTo(cursor, "y", { duration: 0.2, ease: "power3" });
 
+    const showCursor = () => {
+      if (!isVisibleRef.current) {
+        isVisibleRef.current = true;
+        gsap.to(cursor, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.25,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
+      }
+    };
+
+    const hideCursor = () => {
+      if (isVisibleRef.current) {
+        isVisibleRef.current = false;
+        gsap.to(cursor, {
+          opacity: 0,
+          scale: 0.4,
+          duration: 0.25,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
+      }
+    };
+
     const handleMouseMove = (e: MouseEvent) => {
+      showCursor();
       xTo(e.clientX);
       yTo(e.clientY);
     };
 
     const handleMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
 
       // Find the closest parent with data-cursor attribute
-      const cursorTarget = target.closest('[data-cursor]');
+      const cursorTarget = target.closest("[data-cursor]");
 
       if (cursorTarget) {
-        const text = cursorTarget.getAttribute('data-cursor-text') || "View";
+        const text = cursorTarget.getAttribute("data-cursor-text") || "View";
         setHoverText(text);
-        setIsHovering(true);
+        isHoveringRef.current = true;
 
         // Animate to pill shape
         gsap.to(cursor, {
@@ -51,16 +94,16 @@ export default function CustomCursor() {
           backgroundColor: "rgba(255, 255, 255, 1)",
           mixBlendMode: "normal",
           duration: 0.3,
-          ease: "expo.out"
+          ease: "expo.out",
+          overwrite: "auto",
         });
 
-        gsap.to(cursorDot, { opacity: 0, scale: 0, duration: 0.2 });
-        gsap.to(cursorText, { opacity: 1, scale: 1, delay: 0.1, duration: 0.2 });
+        gsap.to(cursorDot, { opacity: 0, scale: 0, duration: 0.2, overwrite: "auto" });
+        gsap.to(cursorText, { opacity: 1, scale: 1, delay: 0.1, duration: 0.2, overwrite: "auto" });
+      } else if (isHoveringRef.current) {
+        isHoveringRef.current = false;
 
-      } else if (isHovering) {
-        setIsHovering(false);
-
-        // Revert to triangle
+        // Revert to default triangle
         gsap.to(cursor, {
           width: 48,
           height: 48,
@@ -68,34 +111,53 @@ export default function CustomCursor() {
           backgroundColor: "transparent",
           mixBlendMode: "difference",
           duration: 0.3,
-          ease: "expo.out"
+          ease: "expo.out",
+          overwrite: "auto",
         });
 
-        gsap.to(cursorText, { opacity: 0, scale: 0, duration: 0.2 });
-        gsap.to(cursorDot, { opacity: 1, scale: 1, delay: 0.1, duration: 0.2 });
+        gsap.to(cursorText, { opacity: 0, scale: 0, duration: 0.2, overwrite: "auto" });
+        gsap.to(cursorDot, { opacity: 1, scale: 1, delay: 0.1, duration: 0.2, overwrite: "auto" });
       }
+    };
+
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (!e.relatedTarget || e.clientY <= 0 || e.clientX <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
+        hideCursor();
+      }
+    };
+
+    const handleDocMouseLeave = () => {
+      hideCursor();
+    };
+
+    const handleDocMouseEnter = () => {
+      showCursor();
+    };
+
+    const handleWindowBlur = () => {
+      hideCursor();
     };
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseover", handleMouseOver);
-
-    // Initial styling
-    gsap.set(cursor, {
-      width: 48,
-      height: 48,
-      backgroundColor: "transparent",
-      mixBlendMode: "difference"
-    });
+    document.addEventListener("mouseleave", handleDocMouseLeave);
+    document.addEventListener("mouseenter", handleDocMouseEnter);
+    document.addEventListener("mouseout", handleMouseLeave);
+    window.addEventListener("blur", handleWindowBlur);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseover", handleMouseOver);
+      document.removeEventListener("mouseleave", handleDocMouseLeave);
+      document.removeEventListener("mouseenter", handleDocMouseEnter);
+      document.removeEventListener("mouseout", handleMouseLeave);
+      window.removeEventListener("blur", handleWindowBlur);
     };
-  }, [isHovering]);
+  }, []);
 
-  // Re-run hover check when route changes (to avoid getting stuck)
+  // Re-run reset when route changes (to avoid getting stuck)
   useEffect(() => {
-    setIsHovering(false);
+    isHoveringRef.current = false;
     if (cursorRef.current) {
       gsap.to(cursorRef.current, {
         width: 48,
@@ -104,20 +166,24 @@ export default function CustomCursor() {
         backgroundColor: "transparent",
         mixBlendMode: "difference",
         duration: 0.3,
-        ease: "expo.out"
+        ease: "expo.out",
       });
+    }
+    if (cursorTextRef.current && cursorDotRef.current) {
+      gsap.to(cursorTextRef.current, { opacity: 0, scale: 0, duration: 0.2 });
+      gsap.to(cursorDotRef.current, { opacity: 1, scale: 1, duration: 0.2 });
     }
   }, [pathname]);
 
   return (
     <div
       ref={cursorRef}
-      className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center overflow-hidden px-4"
+      className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center overflow-hidden px-4 opacity-0"
       style={{
         width: 48,
         height: 48,
-        transform: 'translate(-50%, -50%)',
-        willChange: 'transform, width, height, border-radius',
+        transform: "translate(-50%, -50%)",
+        willChange: "transform, width, height, border-radius, opacity",
       }}
     >
       <div

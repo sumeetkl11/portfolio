@@ -1,4 +1,5 @@
 import { Project, Experience, Education, Profile } from "../types";
+export type { Project, Experience, Education, Profile };
 
 export const profile: Profile = {
   name: "Sumeet Kanhiya",

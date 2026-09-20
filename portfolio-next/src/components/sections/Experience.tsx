@@ -33,12 +33,16 @@ export default function Experience() {
   }, []);
 
   return (
-    <section ref={containerRef} id="experience" className="py-32 bg-black relative">
-      <div className="max-w-4xl mx-auto px-6 relative z-10" ref={contentRef}>
-        <div className="stagger-item mb-16 border-b border-white/10 pb-8">
-          <h2 className="text-4xl md:text-5xl font-display font-bold uppercase tracking-wider">
-            Experience & Education
-          </h2>
+    <section ref={containerRef} id="experience" className="py-32 bg-black relative border-t border-white/5">
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 md:px-16 lg:px-20 relative z-10" ref={contentRef}>
+        <div className="stagger-item mb-16 border-b border-white/10 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <span className="text-xs font-mono uppercase tracking-[0.25em] text-red-500 font-semibold block mb-2">CAREER & MILESTONES</span>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold uppercase tracking-wider">
+              Experience & Education
+            </h2>
+          </div>
+          <span className="text-sm font-mono text-zinc-500">2022 — PRESENT</span>
         </div>
 
         <div className="space-y-16">

@@ -48,15 +48,11 @@ function Particles() {
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          count={PARTICLE_COUNT}
-          array={positions}
-          itemSize={3}
+          args={[positions, 3]}
         />
         <bufferAttribute
           attach="attributes-aRandom"
-          count={PARTICLE_COUNT}
-          array={randoms}
-          itemSize={1}
+          args={[randoms, 1]}
         />
       </bufferGeometry>
       <shaderMaterial
