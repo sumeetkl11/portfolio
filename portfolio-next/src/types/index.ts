@@ -37,3 +37,9 @@ export interface Profile {
   github: string;
   linkedin: string;
 }
+
+export interface KatanaSkill {
+  id: string;
+  name: string;
+  color: string;
+}

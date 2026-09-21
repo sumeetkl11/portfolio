@@ -89,3 +89,12 @@ export const techMarqueeItems = [
   "Groq", "Kotlin", "Jetpack Compose", "WebSockets", "Redis", 
   "Tailwind CSS", "Framer Motion", "DUET · Karachi"
 ];
+
+export const katanaSkills = [
+  { id: "typescript", name: "TypeScript", color: "#3178C6" },
+  { id: "nextjs",     name: "Next.js",    color: "#E2E8F0" },
+  { id: "postgresql", name: "PostgreSQL", color: "#336791" },
+  { id: "react",      name: "React",      color: "#61DAFB" },
+  { id: "nodejs",     name: "Node.js",    color: "#6BBF59" },
+  { id: "kotlin",     name: "Kotlin",     color: "#A97BFF" },
+];
