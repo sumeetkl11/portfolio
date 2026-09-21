@@ -10,8 +10,8 @@ export default function Home() {
     <main className="w-full flex flex-col min-h-screen relative z-0">
       <HeroScrollytelling />
       <ProfileHero />
-      <Experience />
       <ProjectsSlider />
+      <Experience />
       <Skills />
       <Contact />
     </main>

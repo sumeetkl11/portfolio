@@ -37,7 +37,7 @@ export default function Experience() {
       <div className="max-w-7xl mx-auto px-6 sm:px-10 md:px-16 lg:px-20 relative z-10" ref={contentRef}>
         <div className="stagger-item mb-16 border-b border-white/10 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <span className="text-xs font-mono uppercase tracking-[0.25em] text-red-500 font-semibold block mb-2">CAREER & MILESTONES</span>
+            <span className="text-xs font-mono uppercase tracking-[0.25em] text-gray-50 font-semibold block mb-2">CAREER & MILESTONES</span>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold uppercase tracking-wider">
               Experience & Education
             </h2>
