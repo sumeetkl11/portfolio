@@ -43,3 +43,5 @@ export interface KatanaSkill {
   name: string;
   color: string;
 }
+
+export type Skill = KatanaSkill;

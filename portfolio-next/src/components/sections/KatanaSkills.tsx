@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useState, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -10,9 +10,12 @@ import KatanaScene from "@/components/ui/KatanaScene";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function KatanaSkills() {
+  const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const tagRef = useRef<HTMLDivElement>(null);
+
+  const currentSkill = katanaSkills[activeIndex] || katanaSkills[0];
 
   useGSAP(() => {
     if (!containerRef.current || !headingRef.current || !tagRef.current) return;
@@ -42,37 +45,89 @@ export default function KatanaSkills() {
     <section 
       ref={containerRef}
       id="skills" 
-      className="relative w-full min-h-screen bg-black text-white flex flex-col items-center py-24 overflow-hidden border-t border-white/5"
+      className="relative w-full py-16 md:py-24 bg-black text-white flex flex-col items-center justify-center border-t border-white/5 overflow-hidden select-none"
     >
-      {/* Background elements */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(20,20,20,0.5)_0%,rgba(0,0,0,1)_70%)] pointer-events-none" />
-      
-      {/* Header */}
-      <div className="relative z-10 flex flex-col items-center mb-16 px-4">
-        <div 
-          ref={tagRef}
-          className="px-3 py-1 mb-6 text-xs tracking-[0.3em] font-mono border border-white/20 rounded-full text-white/60 uppercase"
-        >
-          Weapons of Choice
-        </div>
-        <h2 
-          ref={headingRef}
-          className="text-4xl md:text-6xl lg:text-7xl font-display uppercase tracking-widest text-center"
-        >
-          My Skills
-        </h2>
-      </div>
+      {/* Cinematic subtle vignette backdrop */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(25,25,30,0.5)_0%,rgba(0,0,0,1)_80%)] pointer-events-none z-0" />
 
-      {/* 3D Scene Container */}
-      <div className="w-full max-w-[1400px] h-[600px] md:h-[700px] relative z-10 px-4">
-        {/* We load the Scene via a wrapper to avoid SSR issues if we had complex Three.js imports, 
-            but React Three Fiber's Canvas is safe to use in client components directly. */}
-        <KatanaScene skills={katanaSkills} />
-      </div>
-      
-      {/* Instructions */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-xs font-mono text-white/40 tracking-widest uppercase pointer-events-none z-20">
-        Hover to draw blade
+      {/* ── Single Unified Card / Box Container (All content encapsulated inside) ── */}
+      <div className="relative z-20 w-full max-w-6xl h-[680px] md:h-[750px] mx-auto px-4 md:px-6">
+        <div className="relative w-full h-full rounded-3xl border border-white/10 bg-black/60 backdrop-blur-2xl shadow-[0_0_80px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col justify-between">
+          {/* Subtle inner card border highlight */}
+          <div className="absolute inset-0 pointer-events-none rounded-3xl border border-white/5 z-20" />
+          
+          {/* ── Fixed Header & Active Skill Text (Directly INSIDE Card at the top) ── */}
+          <div className="relative z-20 flex flex-col items-center pt-7 md:pt-9 px-4 pointer-events-none select-none">
+            {/* Technical Mastery Tag */}
+            <div 
+              ref={tagRef}
+              className="px-3.5 py-0.5 mb-2 text-[10px] md:text-xs tracking-[0.25em] font-mono border border-white/20 rounded-full text-white/60 uppercase backdrop-blur-md"
+            >
+              Technical Mastery
+            </div>
+
+            {/* Main Heading */}
+            <h2 
+              ref={headingRef}
+              className="text-2xl md:text-4xl lg:text-5xl font-display uppercase tracking-widest text-center"
+            >
+              My Skills
+            </h2>
+
+            {/* ── Fixed DOM Active Skill Display ── */}
+            <div className="flex flex-col items-center mt-2 md:mt-3 transition-all duration-300 ease-out">
+              {/* Mastery Number Badge */}
+              <span
+                className="text-[9px] md:text-[11px] font-mono uppercase tracking-[0.22em] px-3 py-0.5 rounded-full border mb-1 backdrop-blur-md transition-all duration-500"
+                style={{
+                  borderColor: `${currentSkill.color}60`,
+                  backgroundColor: `${currentSkill.color}15`,
+                  color: currentSkill.color,
+                  boxShadow: `0 0 14px ${currentSkill.color}30`,
+                }}
+              >
+                Mastery {String(activeIndex + 1).padStart(2, "0")} / {katanaSkills.length}
+              </span>
+
+              {/* Skill Title in Cinzel Display Typography */}
+              <div className="h-7 md:h-9 flex items-center justify-center">
+                <span
+                  key={currentSkill.id}
+                  className="text-xl md:text-3xl lg:text-4xl font-bold tracking-[0.20em] uppercase font-display transition-all duration-500 animate-in fade-in zoom-in-95"
+                  style={{
+                    color: "#ffffff",
+                    textShadow: `0 0 14px ${currentSkill.color}, 0 0 28px ${currentSkill.color}80, 0 0 50px ${currentSkill.color}40`,
+                  }}
+                >
+                  {currentSkill.name}
+                </span>
+              </div>
+
+              {/* Glowing Brand Gradient Accent Line */}
+              <div
+                className="w-16 md:w-24 h-[1.5px] mt-1 rounded-full transition-all duration-500"
+                style={{
+                  background: `linear-gradient(90deg, transparent 0%, ${currentSkill.color} 50%, transparent 100%)`,
+                  boxShadow: `0 0 8px ${currentSkill.color}`,
+                }}
+              />
+            </div>
+          </div>
+
+          {/* ── 3D Scene (Positioned cleanly across card) ── */}
+          <div className="absolute inset-0 w-full h-full z-10">
+            <KatanaScene 
+              skills={katanaSkills} 
+              activeIndex={activeIndex}
+              onActiveChange={setActiveIndex}
+            />
+          </div>
+
+          {/* ── Subtitle / Control Cue inside bottom of card ── */}
+          <div className="relative z-20 pb-2 text-center text-[9px] md:text-[11px] font-mono text-white/30 tracking-widest uppercase pointer-events-none select-none">
+            Scroll or Drag to Explore · Finite Exhibition
+          </div>
+        </div>
       </div>
     </section>
   );

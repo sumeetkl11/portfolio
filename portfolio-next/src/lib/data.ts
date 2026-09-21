@@ -96,5 +96,9 @@ export const katanaSkills = [
   { id: "postgresql", name: "PostgreSQL", color: "#336791" },
   { id: "react",      name: "React",      color: "#61DAFB" },
   { id: "nodejs",     name: "Node.js",    color: "#6BBF59" },
+  { id: "redis",      name: "Redis",      color: "#EF4444" },
+  { id: "gemini",     name: "Gemini API", color: "#8B5CF6" },
+  { id: "websockets", name: "WebSockets", color: "#06B6D4" },
+  { id: "express",    name: "Express.js", color: "#EAB308" },
   { id: "kotlin",     name: "Kotlin",     color: "#A97BFF" },
 ];

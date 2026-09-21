@@ -4,39 +4,34 @@ import { techMarqueeItems } from "@/lib/data";
 import MorphingParticles from "@/components/ui/MorphingParticles";
 
 export default function Skills() {
-  // We duplicate the items to create a seamless infinite marquee loop
+  // Seamless loop with single track duplicated 2x
   const marqueeItems = [...techMarqueeItems, ...techMarqueeItems];
 
   return (
-    <section id="skills" className="py-24 bg-black border-y border-white/5 relative overflow-hidden flex flex-col justify-center min-h-[40vh]">
+    <section 
+      id="tech-stack" 
+      className="py-20 md:py-28 bg-black border-y border-white/5 relative overflow-hidden flex flex-col justify-center min-h-[40vh] select-none"
+    >
       <MorphingParticles />
       
+      {/* Subtle center hairline divider */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
         <div className="w-[100vw] h-[1px] bg-gradient-to-r from-transparent via-white to-transparent" />
       </div>
       
-      <div className="w-full relative z-10 flex overflow-hidden">
-        <div className="animate-marquee flex whitespace-nowrap">
+      {/* Marquee Track with Edge Masking - Continuous Non-Stop Motion */}
+      <div className="w-full relative z-10 flex overflow-hidden [mask-image:linear-gradient(to_right,transparent_0%,black_10%,black_90%,transparent_100%)]">
+        <div className="animate-marquee flex whitespace-nowrap pointer-events-auto">
           {marqueeItems.map((item, idx) => (
-            <span
-              key={idx}
-              className="mx-8 text-4xl md:text-6xl font-display font-bold uppercase tracking-widest text-transparent hover:text-white transition-colors duration-500 cursor-default"
-              style={{ WebkitTextStroke: "1px rgba(255,255,255,0.2)" }}
-            >
-              {item}
-            </span>
-          ))}
-        </div>
-        {/* We need a second marquee div for the seamless loop on larger screens */}
-        <div className="animate-marquee flex whitespace-nowrap absolute top-0" style={{ animationDelay: '-15s' }}>
-          {marqueeItems.map((item, idx) => (
-            <span
-              key={idx + 'second'}
-              className="mx-8 text-4xl md:text-6xl font-display font-bold uppercase tracking-widest text-transparent hover:text-white transition-colors duration-500 cursor-default"
-              style={{ WebkitTextStroke: "1px rgba(255,255,255,0.2)" }}
-            >
-              {item}
-            </span>
+            <div key={idx} className="flex items-center">
+              <span
+                className="mx-6 sm:mx-8 md:mx-10 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold uppercase tracking-widest text-transparent hover:text-white transition-all duration-300 select-none cursor-default hover:drop-shadow-[0_0_30px_rgba(255,255,255,0.9)] hover:brightness-125"
+                style={{ WebkitTextStroke: "1px rgba(255,255,255,0.22)" }}
+              >
+                {item}
+              </span>
+              <span className="text-white/20 font-mono text-xs sm:text-sm select-none">✦</span>
+            </div>
           ))}
         </div>
       </div>

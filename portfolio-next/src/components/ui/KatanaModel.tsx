@@ -4,41 +4,47 @@ import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-import { KatanaSkill } from "@/types";
+import { Skill } from "@/types";
 
 interface KatanaModelProps {
-  skill: KatanaSkill;
+  skill: Skill;
   position: [number, number, number];
+  scale: number;
+  slotDelta: number;
   isHovered: boolean;
+  isCenter: boolean;
   onHoverStart: () => void;
   onHoverEnd: () => void;
-  getLabelEl: () => HTMLDivElement | null;
-  tiltAngle?: number; // tilt towards right in degrees (45° to 70°)
+  onClick: () => void;
+  tiltAngle?: number;
 }
 
-// ── Blade Curvature Constants (Fitted to authentic model arc) ──
+// ── Mathematical constants for authentic Katana circular arc ──
 const ARC_RADIUS = 3.880;
-const ARC_ZC = -0.362;
 const ARC_YC = -3.856;
+const ARC_ZC = -0.362;
+// Subtle unsheathe: exposes golden habaki collar and ~2.5 inches of steel
+const MAX_SUBTLE_DRAW = 0.22;
 
 export default function KatanaModel({
   skill,
   position,
+  scale,
+  slotDelta,
   isHovered,
+  isCenter,
   onHoverStart,
   onHoverEnd,
-  getLabelEl,
-  tiltAngle = 48,
+  onClick,
+  tiltAngle = 37,
 }: KatanaModelProps) {
   const parentRef = useRef<THREE.Group>(null);
-  const swordGroupRef = useRef<THREE.Group>(null);
+  const swordGroupRef = useRef<THREE.Group | null>(null);
   const bladeGlowRef = useRef<THREE.PointLight>(null);
-  const anchorRef = useRef<THREE.Group>(null);
 
-  // Load authentic GLB model
   const gltf = useGLTF("/models/katana.glb");
 
-  // Build isolated SwordGroup and ScabbardGroup
+  // ── Build isolated SwordGroup and ScabbardGroup with unique cloned materials ──
   const { swordGroup, scabbardGroup } = useMemo(() => {
     const swordParts = new Set([
       "Katana_Blade",
@@ -66,44 +72,89 @@ export default function KatanaModel({
     const scGroup = new THREE.Group();
     scGroup.name = "ScabbardGroup";
 
-    // Clone GLTF hierarchy
+    // Clone GLTF hierarchy so every skill katana has independent meshes and materials
     const cloned = gltf.scene.clone(true);
 
-    // Enhance materials for rich PBR reflections and steel glints
+    // Compute custom scabbard lacquer shade per skill
+    const baseColor = new THREE.Color(skill.color);
+    // Dark deep lacquer tint based on skill
+    const scabbardLacquer = new THREE.Color("#07080a").lerp(baseColor, 0.12);
+
+    // Enhance and customize materials per skill
     cloned.traverse((child: THREE.Object3D) => {
+      const nameLower = child.name.toLowerCase();
+
+      // ── MESH CLEANUP: Remove yellow sticks / loop meshes ──
+      // Hide any stray yellow sticks, loops, or shitodome eyelets, while strictly keeping Sageo (rope)
+      if (
+        nameLower.includes("stick") ||
+        nameLower.includes("loop") ||
+        child.name === "Shitodome" ||
+        (nameLower.includes("yellow") && child.name !== "Habaki" && child.name !== "Seppa_Front" && child.name !== "Seppa_Back")
+      ) {
+        child.visible = false;
+        return;
+      }
+
+      // Explicitly keep rope (Sageo) visible
+      if (child.name === "Sageo") {
+        child.visible = true;
+      }
+
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
         if (mesh.material) {
+          // Clone material so each katana has independent color/emissive styling
           mesh.material = (mesh.material as THREE.Material).clone();
           const mat = mesh.material as THREE.MeshStandardMaterial;
 
           if (mesh.name === "Katana_Blade") {
-            // High metalness mirror steel with specular glints
+            // Mirror steel cutting edge with faint skill reflection
             mat.metalness = 0.98;
-            mat.roughness = 0.08;
-            mat.color = new THREE.Color("#f4f6fb");
-            mat.envMapIntensity = 2.8;
+            mat.roughness = 0.06;
+            mat.color = new THREE.Color("#f8fafc");
+            mat.emissive = baseColor.clone().multiplyScalar(0.06);
+            mat.envMapIntensity = 3.2;
             mesh.castShadow = true;
           } else if (["Habaki", "Seppa_Front", "Seppa_Back"].includes(mesh.name)) {
-            // Polished gold brass collar and spacers
-            mat.metalness = 0.92;
-            mat.roughness = 0.18;
+            // Authentic polished gold brass collar and spacers
+            mat.metalness = 0.94;
+            mat.roughness = 0.16;
             mat.color = new THREE.Color("#e8c258");
-            mat.envMapIntensity = 2.0;
+            mat.envMapIntensity = 2.4;
           } else if (mesh.name === "Tsuba") {
-            // Hand guard (patinated black iron)
-            mat.metalness = 0.88;
-            mat.roughness = 0.28;
-            mat.color = new THREE.Color("#3c3630");
-            mat.envMapIntensity = 1.6;
+            // Hand guard: forged black iron with subtle skill rim luster
+            mat.metalness = 0.90;
+            mat.roughness = 0.25;
+            mat.color = new THREE.Color("#22201e");
+            mat.emissive = baseColor.clone().multiplyScalar(0.04);
+            mat.envMapIntensity = 1.8;
+          } else if (mesh.name === "Tsuka_Ito") {
+            // Silk braided handle wrap: dynamically tinted in skill brand color
+            mat.color = baseColor.clone().lerp(new THREE.Color("#ffffff"), 0.15);
+            mat.roughness = 0.45;
+            mat.metalness = 0.12;
+            mat.emissive = baseColor.clone().multiplyScalar(0.18);
+          } else if (mesh.name === "Tsuka_Core") {
+            // Samegawa (rayskin hilt core): clean pearl white
+            mat.color = new THREE.Color("#eae8e4");
+            mat.roughness = 0.70;
+            mat.metalness = 0.05;
           } else if (mesh.name === "Saya") {
-            // Deep Urushi black lacquer with glossy finish
-            mat.metalness = 0.18;
-            mat.roughness = 0.06;
-            mat.color = new THREE.Color("#08080a");
+            // Urushi deep lacquer with custom skill undertone
+            mat.color = scabbardLacquer;
+            mat.metalness = 0.28;
+            mat.roughness = 0.08;
+            mat.emissive = baseColor.clone().multiplyScalar(0.05);
 
-            // Thicken the scabbard so blade is fully covered without clipping
-            mesh.scale.set(1.24, 1.18, 1.0);
+            // Bold, substantial scabbard cross-section
+            mesh.scale.set(1.30, 1.24, 1.0);
+          } else if (mesh.name === "Sageo") {
+            // Woven Sageo scabbard cord: matched skill accent color
+            mat.color = baseColor.clone().lerp(new THREE.Color("#ffffff"), 0.22);
+            mat.roughness = 0.65;
+            mat.metalness = 0.08;
+            mat.emissive = baseColor.clone().multiplyScalar(0.12);
           }
         }
       }
@@ -124,84 +175,75 @@ export default function KatanaModel({
       }
     });
 
-    // Exact concentric offset so scabbard opening meets the Habaki & Tsuba
+    // Exact concentric offset so scabbard mouth meets the Habaki & Tsuba
     scGroup.position.y = 0.0858;
 
-    // ── Add decorative golden accent rings (Semegane) on the scabbard ──
-    const goldMat = new THREE.MeshStandardMaterial({
-      color: "#d4af37",
-      metalness: 0.9,
-      roughness: 0.2,
-    });
-
-    // Koiguchi collar ring (near opening)
-    const ring1 = new THREE.Mesh(
-      new THREE.TorusGeometry(0.038, 0.003, 8, 24),
-      goldMat
-    );
-    ring1.position.set(0, 0, -0.04);
-    scGroup.add(ring1);
-
-    // Mid-scabbard accent ring
-    const ring2 = new THREE.Mesh(
-      new THREE.TorusGeometry(0.034, 0.0025, 8, 24),
-      goldMat
-    );
-    ring2.position.set(0, 0, -0.28);
-    scGroup.add(ring2);
-
     return { swordGroup: sGroup, scabbardGroup: scGroup };
-  }, [gltf.scene]);
+  }, [gltf.scene, skill]);
 
   swordGroupRef.current = swordGroup;
 
-  // Animation values
+  // Animation state values
   const anim = useRef({
     parentLift: 0,
     swordProgress: 0,
-    textOpacity: 0,
     _parentLift: 0,
     _swordProgress: 0,
-    _textOpacity: 0,
     _glowIntensity: 0,
+    curX: position[0],
+    curY: position[1],
+    curZ: position[2],
+    curScale: scale,
   });
 
-  const tempVec = useMemo(() => new THREE.Vector3(), []);
-  const tiltRad = useMemo(() => THREE.MathUtils.degToRad(tiltAngle), [tiltAngle]);
+  const tiltRad = THREE.MathUtils.degToRad(tiltAngle);
+  // Subtle Coverflow inward yaw: side katanas orient gently toward center
+  const yawAngle = THREE.MathUtils.degToRad(-slotDelta * 5.5);
 
-  useFrame(({ camera, size }, delta) => {
+  useFrame((_state, delta) => {
     const a = anim.current;
-    const t = 1 - Math.pow(0.001, delta);
+    if (!swordGroup) return;
 
-    if (isHovered) {
-      // Step 1: Katana lifts up slightly
-      a.parentLift = 0.32;
-      // Step 2: Blade unsheathes along the circular arc
-      a.swordProgress = a._parentLift > 0.18 ? 0.74 : 0;
-      // Step 3: Skill text fades in once blade is drawn
-      a.textOpacity = a._swordProgress > 0.48 ? 1 : 0;
+    const t = 1 - Math.pow(0.001, delta);
+    const carouselLerp = 1 - Math.pow(0.0001, delta);
+
+    // ── Carousel position and scale smooth interpolation ──
+    a.curX = THREE.MathUtils.lerp(a.curX, position[0], carouselLerp);
+    a.curY = THREE.MathUtils.lerp(a.curY, position[1], carouselLerp);
+    a.curZ = THREE.MathUtils.lerp(a.curZ, position[2], carouselLerp);
+    a.curScale = THREE.MathUtils.lerp(a.curScale, scale, carouselLerp);
+
+    if (parentRef.current) {
+      parentRef.current.position.set(
+        a.curX + a._parentLift * Math.sin(tiltRad),
+        a.curY + a._parentLift * Math.cos(tiltRad),
+        a.curZ
+      );
+      parentRef.current.scale.setScalar(a.curScale);
+    }
+
+    // ── Refined Subtle Hover Unsheathe Logic ──
+    // Subtle unsheathe triggers on hover or when cleanly centered
+    const shouldDraw = isHovered || (isCenter && Math.abs(slotDelta) < 0.18);
+
+    if (shouldDraw) {
+      // Gentle lift
+      a.parentLift = 0.18;
+      // Subtle draw: exposes gold habaki and ~2.5 inches of steel
+      a.swordProgress = a._parentLift > 0.08 ? MAX_SUBTLE_DRAW : 0;
     } else {
-      // Reverse cascade: hide text -> sheath blade -> lower katana
-      a.textOpacity = 0;
-      a.swordProgress = a._textOpacity < 0.08 ? 0 : a.swordProgress;
-      a.parentLift = a._swordProgress < 0.08 ? 0 : a.parentLift;
+      a.swordProgress = 0;
+      a.parentLift = 0;
     }
 
     // Smooth lerping
     a._parentLift = THREE.MathUtils.lerp(a._parentLift, a.parentLift, t);
     a._swordProgress = THREE.MathUtils.lerp(a._swordProgress, a.swordProgress, t);
-    a._textOpacity = THREE.MathUtils.lerp(a._textOpacity, a.textOpacity, t * 1.5);
     a._glowIntensity = THREE.MathUtils.lerp(
       a._glowIntensity,
-      a._textOpacity > 0.2 ? 3.5 : 0,
+      a._swordProgress > 0.06 ? 2.5 : 0,
       t
     );
-
-    // Apply parent lift (along diagonal or vertical)
-    if (parentRef.current) {
-      parentRef.current.position.y = a._parentLift * Math.cos(tiltRad);
-      parentRef.current.position.x = a._parentLift * Math.sin(tiltRad);
-    }
 
     // ── Mathematical Circular Arc Kinematics (Zero Scabbard Clipping) ──
     const s = a._swordProgress;
@@ -216,75 +258,48 @@ export default function KatanaModel({
     if (bladeGlowRef.current) {
       bladeGlowRef.current.intensity = a._glowIntensity;
     }
-
-    // ── 2D Screen Projection for HTML Text Overlay via Vector3.project(camera) ──
-    const labelEl = getLabelEl();
-    if (labelEl && anchorRef.current) {
-      anchorRef.current.getWorldPosition(tempVec);
-      tempVec.project(camera);
-
-      if (tempVec.z <= 1) {
-        const screenX = ((tempVec.x + 1) / 2) * size.width;
-        const screenY = ((-tempVec.y + 1) / 2) * size.height;
-
-        labelEl.style.transform = `translate3d(${screenX.toFixed(1)}px, ${screenY.toFixed(1)}px, 0) translate(-50%, -100%) translateY(-16px)`;
-        labelEl.style.opacity = a._textOpacity.toFixed(3);
-      } else {
-        labelEl.style.opacity = "0";
-      }
-    }
   });
 
   return (
-    <group position={position}>
-      {/* ── Parent Group: lifts smoothly on hover ── */}
-      <group ref={parentRef}>
-
-        {/* ── Orientation Group: Tilted to the right at 45°–50° with enlarged scale ── */}
-        <group
-          scale={[3.6, 3.6, 3.6]}
-          rotation={[-Math.PI / 2, 0.35, -tiltRad]}
-          rotation-order="ZYX"
+    <group ref={parentRef}>
+      {/* ── Orientation Group: Tilted at 37° with Coverflow inward yaw ── */}
+      <group
+        rotation={[-Math.PI / 2, yawAngle, -tiltRad]}
+        rotation-order="ZYX"
+      >
+        {/* Generous Hit-target box along the diagonal sword spine */}
+        <mesh
+          visible={false}
+          position={[0, 0, -0.2]}
+          onPointerEnter={(e) => {
+            e.stopPropagation();
+            onHoverStart();
+          }}
+          onPointerLeave={() => onHoverEnd()}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}
         >
-          {/* Hit-target box oriented along the diagonal katana spine (sized to avoid overlap) */}
-          <mesh
-            visible={false}
-            position={[0, 0, -0.2]}
-            onPointerEnter={(e) => {
-              e.stopPropagation();
-              onHoverStart();
-            }}
-            onPointerLeave={() => onHoverEnd()}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (isHovered) onHoverEnd();
-              else onHoverStart();
-            }}
-          >
-            <boxGeometry args={[0.45, 0.45, 2.6]} />
-            <meshBasicMaterial transparent opacity={0} />
-          </mesh>
+          <boxGeometry args={[0.60, 0.60, 3.0]} />
+          <meshBasicMaterial transparent opacity={0} />
+        </mesh>
 
-          {/* Thickened Scabbard (stays anchored) */}
-          <primitive object={scabbardGroup} />
+        {/* Thickened, Clean Scabbard (Zero yellow sticks/loops) */}
+        <primitive object={scabbardGroup} />
 
-          {/* SwordGroup: Blade, Guard, and Handle move together along the circular arc */}
-          <primitive object={swordGroup}>
-            {/* Blade glow light in skill's brand color */}
-            <pointLight
-              ref={bladeGlowRef}
-              position={[0, 0, -0.35]}
-              color={skill.color}
-              distance={3.5}
-              intensity={0}
-              decay={2}
-            />
-
-            {/* Text anchor positioned above the weapon handle */}
-            <group ref={anchorRef} position={[0, 0, 0.42]} />
-          </primitive>
-        </group>
-
+        {/* SwordGroup: Blade, Guard, and Handle move together along the circular arc */}
+        <primitive object={swordGroup}>
+          {/* Subtle blade glow light in skill's brand color */}
+          <pointLight
+            ref={bladeGlowRef}
+            position={[0, 0, -0.25]}
+            color={skill.color}
+            distance={2.8}
+            intensity={0}
+            decay={2}
+          />
+        </primitive>
       </group>
     </group>
   );
