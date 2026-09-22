@@ -162,7 +162,7 @@ export default function KatanaScene({
             onActiveChange(next);
           }
         } else {
-          // At final katana (Kotlin): RELEASE scroll! Allow natural page scroll down
+          // At final katana (Git & GitHub): RELEASE scroll! Allow natural page scroll down
         }
       } else if (dir < 0) {
         // User scrolling UP

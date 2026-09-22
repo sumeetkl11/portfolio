@@ -86,7 +86,7 @@ export const education: Education[] = [
 export const techMarqueeItems = [
   "PERN Stack", "Next.js 15", "React 19", "TypeScript", "Node.js", 
   "PostgreSQL", "Express.js", "REST APIs", "Full-Stack", "Gemini API", 
-  "Groq", "Kotlin", "Jetpack Compose", "WebSockets", "Redis", 
+  "Groq", "Git & GitHub", "Docker", "WebSockets", "Redis", 
   "Tailwind CSS", "Framer Motion", "DUET · Karachi"
 ];
 
@@ -100,5 +100,5 @@ export const katanaSkills = [
   { id: "gemini",     name: "Gemini API", color: "#8B5CF6" },
   { id: "websockets", name: "WebSockets", color: "#06B6D4" },
   { id: "express",    name: "Express.js", color: "#EAB308" },
-  { id: "kotlin",     name: "Kotlin",     color: "#A97BFF" },
+  { id: "git",        name: "Git & GitHub", color: "#F05032" },
 ];
