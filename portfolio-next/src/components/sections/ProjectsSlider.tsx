@@ -45,42 +45,59 @@ export default function ProjectsSlider() {
     const slider = sliderTrackRef.current;
     const section = sectionRef.current;
     if (section && slider) {
-      // Calculate how far to scroll the slider track so all cards + end buffer are viewed
+      // Calculate exact translation needed so the 4th (last) project card lands dead-center in the viewport
       const getScrollAmount = () => {
-        const sliderWidth = slider.scrollWidth;
-        return -(sliderWidth - window.innerWidth);
+        if (!slider) return 0;
+        const cards = slider.querySelectorAll<HTMLElement>(".project-card");
+        const lastCard = cards[cards.length - 1];
+        if (!lastCard) return -(slider.scrollWidth - window.innerWidth);
+
+        // Center of the last card relative to the slider track
+        const cardCenterInTrack = lastCard.offsetLeft + lastCard.offsetWidth / 2;
+        // Target translation to align cardCenterInTrack with the horizontal center of the viewport
+        const targetX = window.innerWidth / 2 - cardCenterInTrack;
+        return Math.min(0, targetX);
       };
 
       const ctx = gsap.context(() => {
-        // Exact horizontal distance needed to bring the last card on-screen
-        const scrollDist = Math.abs(getScrollAmount());
+        // Calculate actual horizontal distance needed
+        const horizontalDistance = Math.abs(getScrollAmount());
+
+        // Convert horizontal distance to scroll duration
+        // Use a scaling factor: 1px of horizontal = 2px of vertical scroll
+        const scrollDistanceForAnimation = horizontalDistance * 2;
+
+        // Add hold time: shorter gap to Skills section
+        const holdDistance = window.innerHeight * 0.6;
+
+        const totalScrollDistance = scrollDistanceForAnimation + holdDistance;
 
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: section,
             start: "top top",
-            // scrollDist = full horizontal travel; extra 80vh = hold time at end
-            end: () => `+=${scrollDist + window.innerHeight * 0.8}`,
+            end: () => `+=${totalScrollDistance}`,
             pin: true,
-            scrub: 1.2,
+            pinSpacing: true,
+            scrub: 1,
             anticipatePin: 1,
             invalidateOnRefresh: true,
-            // Only raise z-index while actually pinned so sections below aren't buried
-            onPin: () => { section.style.zIndex = "50"; },
-            onUnpin: () => { section.style.zIndex = ""; },
           }
         });
 
-        // Phase 1: slide all cards into view (takes up scrollDist worth of scroll)
+        // Calculate proportional durations for timeline phases
+        const animationPhase = scrollDistanceForAnimation / totalScrollDistance;
+        const holdPhase = holdDistance / totalScrollDistance;
+
+        // Phase 1: Smoothly slide all cards until Card 4 is centered
         tl.to(slider, {
           x: () => getScrollAmount(),
           ease: "none",
-          // proportion of total timeline = scrollDist / (scrollDist + hold)
-          duration: scrollDist / (scrollDist + window.innerHeight * 0.8),
+          duration: animationPhase,
         })
-        // Phase 2: hold — user scrolls for 80vh while final card stays visible
+        // Phase 2: Rest hold — Card 4 stays centered while user scrolls
         .to({}, {
-          duration: (window.innerHeight * 0.8) / (scrollDist + window.innerHeight * 0.8),
+          duration: holdPhase,
         });
       }, sectionRef);
       
@@ -102,7 +119,7 @@ export default function ProjectsSlider() {
 
   return (
     <>
-      <section ref={sectionRef} id="projects" className="h-screen w-full relative bg-black overflow-hidden flex flex-col justify-center">
+      <section ref={sectionRef} id="projects" className="h-screen w-full relative bg-black overflow-hidden flex flex-col justify-center z-10">
         {/* Subtle grid background */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
@@ -121,7 +138,7 @@ export default function ProjectsSlider() {
               <div
                 key={project.id}
                 onClick={() => setSelectedProject(project)}
-                className="group relative w-[85vw] sm:w-[60vw] md:w-[45vw] lg:w-[35vw] h-[55vh] min-h-[460px] max-h-[580px] rounded-3xl overflow-hidden cursor-none glass-panel border border-white/5 transition-colors duration-500 hover:border-white/20 bg-zinc-900/50 flex flex-col justify-between p-6 md:p-8"
+                className="project-card group relative w-[85vw] sm:w-[60vw] md:w-[45vw] lg:w-[35vw] h-[55vh] min-h-[460px] max-h-[580px] rounded-3xl overflow-hidden cursor-none glass-panel border border-white/5 transition-colors duration-500 hover:border-white/20 bg-zinc-900/50 flex flex-col justify-between p-6 md:p-8 flex-shrink-0"
                 data-cursor="project"
                 data-cursor-text="View Project"
               >
