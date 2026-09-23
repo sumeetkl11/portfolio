@@ -152,12 +152,12 @@ export default function Contact() {
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-display font-bold uppercase tracking-wider mb-6">
-            Initiate Protocol
+            Get In Touch
           </h2>
           <p className="text-zinc-400 text-lg">
-            Looking for a resilient systems architect to build your next high-throughput platform?
+            Have a project in mind or want to collaborate?
             <br />
-            Send a transmission.
+            Let's talk.
           </p>
         </div>
 
@@ -181,7 +181,7 @@ export default function Contact() {
 
           {/* Name & Email Row */}
           <div
-            ref={(el) => (fieldsRef.current[0] = el)}
+            ref={(el) => { fieldsRef.current[0] = el; }}
             className="grid grid-cols-1 md:grid-cols-2 gap-6 opacity-0"
           >
             <FormInput
@@ -191,10 +191,10 @@ export default function Contact() {
               id="name"
               type="text"
               label="Name"
-              placeholder="John Doe"
+              placeholder=""
               icon={User}
               error={errors.name?.message}
-              isValid={isNameValid}
+              isValid={Boolean(isNameValid)}
               required
             />
 
@@ -205,17 +205,17 @@ export default function Contact() {
               id="email"
               type="email"
               label="Email"
-              placeholder="john@example.com"
+              placeholder=""
               icon={Mail}
               error={errors.email?.message}
-              isValid={isEmailValid}
+              isValid={Boolean(isEmailValid)}
               required
             />
           </div>
 
           {/* Message Field */}
           <div
-            ref={(el) => (fieldsRef.current[1] = el)}
+            ref={(el) => { fieldsRef.current[1] = el; }}
             className="opacity-0"
           >
             <FormTextarea
@@ -227,7 +227,7 @@ export default function Contact() {
               placeholder="How can I help you?"
               icon={MessageSquare}
               error={errors.message?.message}
-              isValid={isMessageValid}
+              isValid={Boolean(isMessageValid)}
               showCounter
               maxLength={1000}
               rows={5}
@@ -237,7 +237,7 @@ export default function Contact() {
 
           {/* Submit Button */}
           <div
-            ref={(el) => (fieldsRef.current[2] = el)}
+            ref={(el) => { fieldsRef.current[2] = el; }}
             className="opacity-0"
           >
             <FormButton
@@ -246,11 +246,11 @@ export default function Contact() {
               isSuccess={submitStatus === "success"}
               isError={submitStatus === "error"}
               disabled={isSubmitting || isRateLimited}
-              loadingText="Transmitting..."
-              successText="Transmission Complete"
-              errorText="Transmission Failed"
+              loadingText="Sending..."
+              successText="Message Sent"
+              errorText="Failed to Send"
             >
-              Transmit
+              Send Message
             </FormButton>
           </div>
 
@@ -304,9 +304,9 @@ export default function Contact() {
                 />
               </svg>
             </div>
-            <h3 className="text-2xl font-display font-bold mb-2">Transmission Successful</h3>
+            <h3 className="text-2xl font-display font-bold mb-2">Message Sent Successfully</h3>
             <p className="text-zinc-400 font-mono text-sm">
-              Message received. I will respond shortly.
+              Thanks for reaching out! I'll get back to you soon.
             </p>
           </div>
         </div>
