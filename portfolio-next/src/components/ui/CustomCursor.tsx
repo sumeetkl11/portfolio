@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
-import { ArrowUpRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const cursorTextRef = useRef<HTMLDivElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
-  const [hoverText, setHoverText] = useState("");
   const isHoveringRef = useRef(false);
   const isVisibleRef = useRef(false);
   const pathname = usePathname();
@@ -22,9 +19,8 @@ export default function CustomCursor() {
 
     const cursor = cursorRef.current;
     const cursorDot = cursorDotRef.current;
-    const cursorText = cursorTextRef.current;
 
-    if (!cursor || !cursorDot || !cursorText) return;
+    if (!cursor || !cursorDot) return;
 
     // Set initial position & hide cursor until mouse enters
     gsap.set(cursor, {
@@ -39,8 +35,8 @@ export default function CustomCursor() {
     });
 
     // GSAP quickTo for highly performant tracking
-    const xTo = gsap.quickTo(cursor, "x", { duration: 0.2, ease: "power3" });
-    const yTo = gsap.quickTo(cursor, "y", { duration: 0.2, ease: "power3" });
+    const xTo = gsap.quickTo(cursor, "x", { duration: 0.18, ease: "power3" });
+    const yTo = gsap.quickTo(cursor, "y", { duration: 0.18, ease: "power3" });
 
     const showCursor = () => {
       if (!isVisibleRef.current) {
@@ -78,45 +74,33 @@ export default function CustomCursor() {
       const target = e.target as HTMLElement | null;
       if (!target) return;
 
-      // Find the closest parent with data-cursor attribute
-      const cursorTarget = target.closest("[data-cursor]");
+      // Modal dialog asking to suppress custom cursor
+      if (target.closest('[data-cursor="none"]')) {
+        hideCursor();
+        return;
+      }
 
-      if (cursorTarget) {
-        const text = cursorTarget.getAttribute("data-cursor-text") || "View";
-        setHoverText(text);
+      // Check if hovering over any clickable / interactive element
+      const isInteractive = target.closest("a, button, [role='button'], .project-card, [data-cursor]");
+
+      if (isInteractive && !isHoveringRef.current) {
         isHoveringRef.current = true;
-
-        // Animate to pill shape
-        gsap.to(cursor, {
-          width: "auto",
-          height: 40,
-          borderRadius: 20,
-          backgroundColor: "rgba(255, 255, 255, 1)",
-          mixBlendMode: "normal",
-          duration: 0.3,
-          ease: "expo.out",
+        // Smooth scale-up on interactive elements
+        gsap.to(cursorDot, {
+          scale: 1.35,
+          duration: 0.25,
+          ease: "power2.out",
           overwrite: "auto",
         });
-
-        gsap.to(cursorDot, { opacity: 0, scale: 0, duration: 0.2, overwrite: "auto" });
-        gsap.to(cursorText, { opacity: 1, scale: 1, delay: 0.1, duration: 0.2, overwrite: "auto" });
-      } else if (isHoveringRef.current) {
+      } else if (!isInteractive && isHoveringRef.current) {
         isHoveringRef.current = false;
-
-        // Revert to default triangle
-        gsap.to(cursor, {
-          width: 48,
-          height: 48,
-          borderRadius: 0,
-          backgroundColor: "transparent",
-          mixBlendMode: "difference",
-          duration: 0.3,
-          ease: "expo.out",
+        // Revert to normal
+        gsap.to(cursorDot, {
+          scale: 1,
+          duration: 0.25,
+          ease: "power2.out",
           overwrite: "auto",
         });
-
-        gsap.to(cursorText, { opacity: 0, scale: 0, duration: 0.2, overwrite: "auto" });
-        gsap.to(cursorDot, { opacity: 1, scale: 1, delay: 0.1, duration: 0.2, overwrite: "auto" });
       }
     };
 
@@ -155,40 +139,28 @@ export default function CustomCursor() {
     };
   }, []);
 
-  // Re-run reset when route changes (to avoid getting stuck)
+  // Re-run reset when route changes
   useEffect(() => {
     isHoveringRef.current = false;
-    if (cursorRef.current) {
-      gsap.to(cursorRef.current, {
-        width: 48,
-        height: 48,
-        borderRadius: 0,
-        backgroundColor: "transparent",
-        mixBlendMode: "difference",
-        duration: 0.3,
-        ease: "expo.out",
-      });
-    }
-    if (cursorTextRef.current && cursorDotRef.current) {
-      gsap.to(cursorTextRef.current, { opacity: 0, scale: 0, duration: 0.2 });
-      gsap.to(cursorDotRef.current, { opacity: 1, scale: 1, duration: 0.2 });
+    if (cursorDotRef.current) {
+      gsap.to(cursorDotRef.current, { scale: 1, duration: 0.2, overwrite: "auto" });
     }
   }, [pathname]);
 
   return (
     <div
       ref={cursorRef}
-      className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center overflow-hidden px-4 opacity-0"
+      className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center overflow-hidden opacity-0"
       style={{
         width: 48,
         height: 48,
         transform: "translate(-50%, -50%)",
-        willChange: "transform, width, height, border-radius, opacity",
+        willChange: "transform, opacity",
       }}
     >
       <div
         ref={cursorDotRef}
-        className="absolute flex items-center justify-center w-full h-full"
+        className="flex items-center justify-center w-full h-full"
       >
         <svg
           viewBox="0 0 24 24"
@@ -197,13 +169,6 @@ export default function CustomCursor() {
         >
           <polygon points="12,2 22,22 2,22" />
         </svg>
-      </div>
-      <div
-        ref={cursorTextRef}
-        className="flex items-center gap-2 opacity-0 scale-0 text-black font-medium text-sm whitespace-nowrap"
-      >
-        <span>{hoverText}</span>
-        <ArrowUpRight className="w-4 h-4" />
       </div>
     </div>
   );

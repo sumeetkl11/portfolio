@@ -139,8 +139,6 @@ export default function ProjectsSlider() {
                 key={project.id}
                 onClick={() => setSelectedProject(project)}
                 className="project-card group relative w-[85vw] sm:w-[60vw] md:w-[45vw] lg:w-[35vw] h-[55vh] min-h-[460px] max-h-[580px] rounded-3xl overflow-hidden cursor-none glass-panel border border-white/5 transition-colors duration-500 hover:border-white/20 bg-zinc-900/50 flex flex-col justify-between p-6 md:p-8 flex-shrink-0"
-                data-cursor="project"
-                data-cursor-text="View Project"
               >
                 {/* Background image could go here, for now it's a gradient */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
@@ -196,7 +194,6 @@ export default function ProjectsSlider() {
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
                         className="flex items-center gap-2 text-sm font-mono text-zinc-400 hover:text-white transition-colors cursor-pointer relative z-20"
-                        data-cursor="pointer"
                       >
                         <GithubIcon className="w-4 h-4" />
                         Code
@@ -209,7 +206,6 @@ export default function ProjectsSlider() {
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
                         className="flex items-center gap-2 text-sm font-mono text-zinc-400 hover:text-white transition-colors cursor-pointer relative z-20"
-                        data-cursor="pointer"
                       >
                         <ExternalLink className="w-4 h-4" />
                         Live Site

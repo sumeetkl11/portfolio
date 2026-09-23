@@ -12,46 +12,68 @@ gsap.registerPlugin(ScrollTrigger);
 export default function KatanaSkills() {
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLElement>(null);
+  const cardWrapperRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const tagRef = useRef<HTMLDivElement>(null);
 
   const currentSkill = katanaSkills[activeIndex] || katanaSkills[0];
 
   useGSAP(() => {
-    if (!containerRef.current || !headingRef.current || !tagRef.current) return;
+    if (!containerRef.current || !cardWrapperRef.current) return;
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 70%",
-        end: "top 30%",
-        scrub: false,
+    // Smooth scrubbed slide-up & float reveal as user scrolls from Projects into KatanaSkills
+    gsap.fromTo(
+      cardWrapperRef.current,
+      { y: 140, opacity: 0.2, scale: 0.94 },
+      {
+        y: 0,
+        opacity: 1,
+        scale: 1,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 95%",
+          end: "top 25%",
+          scrub: 1.2,
+          invalidateOnRefresh: true,
+        },
       }
-    });
-
-    tl.fromTo(
-      tagRef.current,
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" }
-    ).fromTo(
-      headingRef.current,
-      { y: 30, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
-      "-=0.4"
     );
+
+    if (headingRef.current && tagRef.current) {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 65%",
+          end: "top 25%",
+          scrub: false,
+        },
+      });
+
+      tl.fromTo(
+        tagRef.current,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" }
+      ).fromTo(
+        headingRef.current,
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
+        "-=0.4"
+      );
+    }
   }, { scope: containerRef });
 
   return (
     <section 
       ref={containerRef}
       id="skills" 
-      className="relative w-full py-16 md:py-24 bg-black text-white flex flex-col items-center justify-center border-t border-white/5 overflow-hidden select-none"
+      className="relative z-20 w-full py-16 md:py-24 bg-black text-white flex flex-col items-center justify-center border-t border-white/5 overflow-hidden select-none"
     >
       {/* Cinematic subtle vignette backdrop */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(25,25,30,0.5)_0%,rgba(0,0,0,1)_80%)] pointer-events-none z-0" />
 
       {/* ── Single Unified Card / Box Container (All content encapsulated inside) ── */}
-      <div className="relative z-20 w-full max-w-6xl h-[680px] md:h-[750px] mx-auto px-4 md:px-6">
+      <div ref={cardWrapperRef} className="relative z-20 w-full max-w-6xl h-[680px] md:h-[750px] mx-auto px-4 md:px-6">
         <div className="relative w-full h-full rounded-3xl border border-white/10 bg-black/60 backdrop-blur-2xl shadow-[0_0_80px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col justify-between">
           {/* Subtle inner card border highlight */}
           <div className="absolute inset-0 pointer-events-none rounded-3xl border border-white/5 z-20" />

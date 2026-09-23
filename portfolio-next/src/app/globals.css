@@ -28,9 +28,9 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Hide system cursor — custom cursor handles pointer devices; touch devices are exempt */
-  html, body {
-    cursor: none;
+  /* Force hide system cursor across all elements so OS cursor never overlaps custom cursor */
+  html, body, *, *::before, *::after {
+    cursor: none !important;
   }
 
   /* Restore focus-visible outlines for keyboard navigation (WCAG 2.4.7) */
