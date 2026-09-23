@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { profile } from "@/lib/data";
 import clsx from "clsx";
+import { useLenis } from "@/components/layout/SmoothScroll";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const lenis = useLenis();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,7 +27,14 @@ export default function Navbar() {
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     const target = document.querySelector(href);
-    if (target) {
+    if (!target) return;
+
+    if (lenis) {
+      lenis.scrollTo(target as HTMLElement, {
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      });
+    } else {
       target.scrollIntoView({ behavior: "smooth" });
     }
   };

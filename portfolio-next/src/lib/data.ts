@@ -13,44 +13,60 @@ export const profile: Profile = {
 
 export const projects: Project[] = [
   {
-    id: "linkforge",
-    title: "Linkforge",
-    category: "AI · API Pipeline",
-    tagline: "High-throughput autonomous web scraper & vector intelligence pipeline.",
-    description: "URL redirection pipeline featuring fast Redis hash lookups, responsive Tailwind control panels, and transactional analytics.",
-    techStack: ["React 19", "TypeScript", "Node.js", "PostgreSQL", "Socket.io", "Redis"],
+    id: "faultflow",
+    title: "FaultFlow",
+    category: "DISTRIBUTED SYSTEMS · BROKER",
+    tagline: "Resilient Multi-Tenant Webhook Orchestration & Telemetry Gateway.",
+    description: "High-throughput webhook delivery engine featuring sub-25ms API ingress and atomic Redis SETNX idempotency. Coordinates 20-worker BullMQ clusters with HMAC-SHA256 signatures, exponential jitter backoff, DLQ rate throttling, and live SSE telemetry.",
+    techStack: ["Node.js", "Express", "BullMQ", "Redis", "PostgreSQL", "SSE", "Zod"],
     metrics: [
-      { label: "URLs processed/day", value: "10k+" },
-      { label: "P99 API latency", value: "<200ms" }
+      { label: "Ingress Latency", value: "<25ms" },
+      { label: "DLQ Remediation", value: "50 req/s" }
     ],
-    liveUrl: "https://linkforge-mauve.vercel.app",
-    repoUrl: "https://github.com/sumeetkl11/linkforge",
+    liveUrl: "https://github.com/sumeetkl11/FaultFlow_WebHook",
+    repoUrl: "https://github.com/sumeetkl11/FaultFlow_WebHook",
   },
   {
     id: "sock-io",
     title: "Sock.io",
-    category: "Systems · WebRTC",
-    tagline: "Peer-to-peer binary streaming engine with zero-allocation buffers.",
-    description: "Bi-directional messaging hub built with native WebSocket topologies, heartbeat health monitors, and partitioned PostgreSQL rooms.",
-    techStack: ["Node.js", "MongoDB", "WebRTC", "React"],
+    category: "WEBRTC · REAL-TIME",
+    tagline: "Peer-to-peer binary streaming engine and real-time messaging hub.",
+    description: "Full-stack communication suite combining low-latency WebSocket messaging with WebRTC peer-to-peer audio calls and STUN NAT traversal. Backed by MongoDB Atlas, a Redis adapter for multi-instance socket mapping, and IndexedDB for offline-first message queues.",
+    techStack: ["React 19", "Node.js", "Socket.io", "WebRTC", "MongoDB", "Redis", "PWA"],
     metrics: [
-      { label: "WebSocket sync", value: "<24ms P99" }
+      { label: "WebSocket Sync", value: "<24ms P99" },
+      { label: "Concurrent Scale", value: "500+ users" }
     ],
-    repoUrl: "https://github.com/sumeetkl11/sock.io",
+    liveUrl: "https://github.com/sumeetkl11/Sock.io",
+    repoUrl: "https://github.com/sumeetkl11/Sock.io",
   },
   {
     id: "chefcraft",
     title: "ChefCraft",
-    category: "Gemini API · Multimodal",
-    tagline: "Multimodal sensory recipe synthesis engine generating real-time culinary paths.",
-    description: "Automated meal scheduling pipeline executing Gemini API prompt matrices. Backed by PostgreSQL query caches, Express REST endpoints, and dynamic macronutrient rebalancing.",
-    techStack: ["Gemini 1.5 Pro", "Next.js", "PostgreSQL", "Tailwind CSS"],
+    category: "GEMINI API · MULTIMODAL",
+    tagline: "Multimodal recipe synthesis engine generating real-time culinary paths.",
+    description: "AI-driven meal-planning platform leveraging Google Gemini API structured prompt matrices to synthesize tailored dietary regimens in sub-2 seconds. Features 25+ Express REST endpoints with PostgreSQL query caching, slashing retrieval latency by 25%.",
+    techStack: ["Gemini 1.5 Pro", "Next.js", "Express.js", "PostgreSQL", "Tailwind CSS"],
     metrics: [
-      { label: "REST Endpoints", value: "25+" },
-      { label: "Generation latency", value: "sub-2s" }
+      { label: "Generation Latency", value: "<2s" },
+      { label: "Retrieval Speedup", value: "+25%" }
     ],
-    liveUrl: "https://chef-craft.vercel.app",
-    repoUrl: "https://github.com/sumeetkl11/chefcraft",
+    liveUrl: "https://github.com/sumeetkl11/ChefCraft",
+    repoUrl: "https://github.com/sumeetkl11/ChefCraft",
+  },
+  {
+    id: "linkforge",
+    title: "Linkforge",
+    category: "COLLABORATION · AI PIPELINE",
+    tagline: "Modular team collaboration ecosystem with real-time sync and AI sprint planning.",
+    description: "4-module workspace unifying team chat, Kanban boards, project wikis, and member directories. Scaled across 500+ concurrent connections via Socket.io and Redis pub/sub, integrating the Gemini API for intelligent sprint planning and task prioritization.",
+    techStack: ["React 19", "TypeScript", "Node.js", "PostgreSQL", "Socket.io", "Redis", "Gemini API"],
+    metrics: [
+      { label: "Concurrent Scale", value: "500+ users" },
+      { label: "Integrated Modules", value: "4 suites" }
+    ],
+    liveUrl: "https://github.com/sumeetkl11/Linkforge",
+    repoUrl: "https://github.com/sumeetkl11/Linkforge",
   }
 ];
 

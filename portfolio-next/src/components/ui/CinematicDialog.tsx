@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { X, ArrowUpRight, Code2 } from "lucide-react";
-import { type Project } from "@/lib/data";
+import { type Project } from "@/types";
 
 interface CinematicDialogProps {
   project: Project | null;
@@ -25,8 +25,14 @@ export default function CinematicDialog({ project, isOpen, onClose }: CinematicD
   }, [project]);
 
   useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
     if (isOpen) {
-      // Open animation
       if (overlayRef.current) {
         gsap.to(overlayRef.current, {
           opacity: 1,
@@ -44,8 +50,7 @@ export default function CinematicDialog({ project, isOpen, onClose }: CinematicD
           { scale: 1, opacity: 1, y: 0, duration: 0.8, ease: "expo.out", delay: 0.1 }
         );
       }
-      
-      // Animate content children
+
       if (contentRef.current) {
         gsap.fromTo(
           contentRef.current.children,
@@ -53,11 +58,7 @@ export default function CinematicDialog({ project, isOpen, onClose }: CinematicD
           { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: "power2.out", delay: 0.3 }
         );
       }
-      
-      // Lock body scroll
-      document.body.style.overflow = "hidden";
     } else {
-      // Close animation
       if (dialogRef.current) {
         gsap.to(dialogRef.current, {
           scale: 0.95,
@@ -67,7 +68,7 @@ export default function CinematicDialog({ project, isOpen, onClose }: CinematicD
           ease: "power2.in"
         });
       }
-      
+
       if (overlayRef.current) {
         gsap.to(overlayRef.current, {
           opacity: 0,
@@ -78,17 +79,7 @@ export default function CinematicDialog({ project, isOpen, onClose }: CinematicD
           delay: 0.1
         });
       }
-      
-      // Unlock body scroll
-      document.body.style.overflow = "";
-      
-      // We can optionally clear the internal project after animation completes,
-      // but it's hidden anyway, so it's fine to keep it.
     }
-    
-    return () => {
-      document.body.style.overflow = "";
-    };
   }, [isOpen]);
 
   if (!internalProject) return null;
@@ -134,8 +125,7 @@ export default function CinematicDialog({ project, isOpen, onClose }: CinematicD
               <div>
                 <h3 className="text-sm font-mono text-zinc-500 uppercase tracking-widest mb-4">The Challenge</h3>
                 <p className="text-zinc-400 leading-relaxed text-sm md:text-base">
-                  A comprehensive redesign and re-architecture focused on performance, accessibility, and creating a memorable user experience through cinematic motion. 
-                  (Placeholder text for detailed case study)
+                  {internalProject.description}
                 </p>
               </div>
               

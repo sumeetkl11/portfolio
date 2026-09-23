@@ -179,7 +179,7 @@ export default function KatanaModel({
     scGroup.position.y = 0.0858;
 
     return { swordGroup: sGroup, scabbardGroup: scGroup };
-  }, [gltf.scene, skill]);
+  }, [gltf.scene, skill.id, skill.color]);
 
   swordGroupRef.current = swordGroup;
 

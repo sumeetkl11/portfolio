@@ -1,35 +1,101 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Send, Loader2 } from "lucide-react";
+import { User, Mail, MessageSquare } from "lucide-react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-const formSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  message: z.string().min(10, "Message must be at least 10 characters"),
-});
+import { FormInput, FormTextarea, FormButton } from "@/components/ui/form";
+import { contactFormSchema, ContactFormData, FormStatus } from "@/lib/formValidation";
+import { useRateLimitTimer } from "@/hooks/useRateLimitTimer";
+import { animateFieldEntry, animateFormSuccess } from "@/hooks/useFormAnimation";
 
-type FormData = z.infer<typeof formSchema>;
+// Register GSAP plugin
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export default function Contact() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [submitStatus, setSubmitStatus] = useState<FormStatus>("idle");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const { secondsRemaining, isActive: isRateLimited, startTimer } = useRateLimitTimer();
+
+  const sectionRef = useRef<HTMLElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const successRef = useRef<HTMLDivElement>(null);
+  const fieldsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    formState: { errors, isSubmitting },
+    trigger,
+    watch,
+  } = useForm<ContactFormData>({
+    resolver: zodResolver(contactFormSchema),
+    mode: "onBlur",
   });
 
-  const onSubmit = async (data: FormData) => {
-    setIsSubmitting(true);
-    setSubmitStatus("idle");
+  // Watch form values for validation states
+  const nameValue = watch("name");
+  const emailValue = watch("email");
+  const messageValue = watch("message");
+
+  // Check if fields are valid
+  const isNameValid = nameValue && nameValue.length >= 2 && !errors.name;
+  const isEmailValid = emailValue && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue) && !errors.email;
+  const isMessageValid = messageValue && messageValue.length >= 10 && !errors.message;
+
+  // Entry animations on scroll
+  useEffect(() => {
+    if (!sectionRef.current) return;
+
+    const fields = fieldsRef.current.filter(Boolean);
+    if (fields.length === 0) return;
+
+    // Animate fields with stagger
+    fields.forEach((field, index) => {
+      if (field) {
+        animateFieldEntry(field, index * 0.15);
+      }
+    });
+
+    // ScrollTrigger for visibility
+    ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: "top 70%",
+      once: true,
+      onEnter: () => {
+        fields.forEach((field, index) => {
+          if (field) {
+            gsap.fromTo(
+              field,
+              { opacity: 0, y: 40, rotateX: 10 },
+              {
+                opacity: 1,
+                y: 0,
+                rotateX: 0,
+                duration: 0.8,
+                delay: index * 0.15,
+                ease: "expo.out",
+              }
+            );
+          }
+        });
+      },
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    };
+  }, []);
+
+  const onSubmit = async (data: ContactFormData) => {
+    setSubmitStatus("submitting");
+    setErrorMessage("");
 
     try {
       const response = await fetch("/api/contact", {
@@ -38,91 +104,212 @@ export default function Contact() {
         body: JSON.stringify(data),
       });
 
-      if (!response.ok) throw new Error("Failed to send message");
+      if (response.status === 429) {
+        setSubmitStatus("rate-limited");
+        setErrorMessage(`Rate limit exceeded. Please wait ${secondsRemaining || 60} seconds.`);
+        startTimer(60);
+        return;
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to send message");
+      }
 
       setSubmitStatus("success");
-      reset();
+
+      // Animate success
+      if (formRef.current && successRef.current) {
+        animateFormSuccess(formRef.current, successRef.current, () => {
+          reset();
+          setSubmitStatus("idle");
+        });
+      } else {
+        // Fallback if refs aren't ready
+        setTimeout(() => {
+          reset();
+          setSubmitStatus("idle");
+        }, 3000);
+      }
     } catch (error) {
       setSubmitStatus("error");
-    } finally {
-      setIsSubmitting(false);
+      setErrorMessage(
+        error instanceof Error ? error.message : "Transmission failed. Please try again."
+      );
     }
   };
 
   return (
-    <section id="contact" className="py-32 bg-black relative">
+    <section
+      id="contact"
+      ref={sectionRef}
+      className="py-32 bg-black relative overflow-hidden"
+    >
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent pointer-events-none" />
+
       <div className="max-w-3xl mx-auto px-6 relative z-10">
+        {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-display font-bold uppercase tracking-wider mb-6">
             Initiate Protocol
           </h2>
           <p className="text-zinc-400 text-lg">
-            Looking for a resilient systems architect to build your next high-throughput platform? Send a transmission.
+            Looking for a resilient systems architect to build your next high-throughput platform?
+            <br />
+            Send a transmission.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="name" className="block text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Name</label>
-              <input
-                {...register("name")}
-                type="text"
-                id="name"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-white/30 transition-colors"
-                placeholder="John Doe"
-              />
-              {errors.name && <p className="text-red-400 text-xs mt-2">{errors.name.message}</p>}
-            </div>
-            
-            <div>
-              <label htmlFor="email" className="block text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Email</label>
-              <input
-                {...register("email")}
-                type="email"
-                id="email"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-white/30 transition-colors"
-                placeholder="john@example.com"
-              />
-              {errors.email && <p className="text-red-400 text-xs mt-2">{errors.email.message}</p>}
-            </div>
-          </div>
+        {/* Form */}
+        <form
+          ref={formRef}
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-6"
+          noValidate
+        >
+          {/* Honeypot field (hidden) */}
+          <input
+            {...register("website")}
+            type="text"
+            name="website"
+            aria-hidden="true"
+            tabIndex={-1}
+            autoComplete="off"
+            style={{ position: "absolute", left: "-9999px", opacity: 0 }}
+          />
 
-          <div>
-            <label htmlFor="message" className="block text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Message</label>
-            <textarea
-              {...register("message")}
-              id="message"
-              rows={5}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-white/30 transition-colors resize-none"
-              placeholder="How can I help you?"
-            />
-            {errors.message && <p className="text-red-400 text-xs mt-2">{errors.message.message}</p>}
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-4 bg-white text-black font-bold uppercase tracking-widest rounded-lg hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          {/* Name & Email Row */}
+          <div
+            ref={(el) => (fieldsRef.current[0] = el)}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6 opacity-0"
           >
-            {isSubmitting ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <>Transmit <Send className="w-4 h-4" /></>
-            )}
-          </button>
+            <FormInput
+              {...register("name", {
+                onChange: () => trigger("name"),
+              })}
+              id="name"
+              type="text"
+              label="Name"
+              placeholder="John Doe"
+              icon={User}
+              error={errors.name?.message}
+              isValid={isNameValid}
+              required
+            />
 
-          {submitStatus === "success" && (
-            <p className="text-green-400 text-center text-sm font-mono mt-4">
-              Transmission successful. I will respond shortly.
-            </p>
+            <FormInput
+              {...register("email", {
+                onChange: () => trigger("email"),
+              })}
+              id="email"
+              type="email"
+              label="Email"
+              placeholder="john@example.com"
+              icon={Mail}
+              error={errors.email?.message}
+              isValid={isEmailValid}
+              required
+            />
+          </div>
+
+          {/* Message Field */}
+          <div
+            ref={(el) => (fieldsRef.current[1] = el)}
+            className="opacity-0"
+          >
+            <FormTextarea
+              {...register("message", {
+                onChange: () => trigger("message"),
+              })}
+              id="message"
+              label="Message"
+              placeholder="How can I help you?"
+              icon={MessageSquare}
+              error={errors.message?.message}
+              isValid={isMessageValid}
+              showCounter
+              maxLength={1000}
+              rows={5}
+              required
+            />
+          </div>
+
+          {/* Submit Button */}
+          <div
+            ref={(el) => (fieldsRef.current[2] = el)}
+            className="opacity-0"
+          >
+            <FormButton
+              type="submit"
+              isLoading={submitStatus === "submitting"}
+              isSuccess={submitStatus === "success"}
+              isError={submitStatus === "error"}
+              disabled={isSubmitting || isRateLimited}
+              loadingText="Transmitting..."
+              successText="Transmission Complete"
+              errorText="Transmission Failed"
+            >
+              Transmit
+            </FormButton>
+          </div>
+
+          {/* Rate Limit Message */}
+          {isRateLimited && (
+            <div className="flex items-center justify-center gap-3 p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+              <div className="relative w-48 h-2 bg-white/10 rounded-full overflow-hidden">
+                <div
+                  className="absolute inset-y-0 left-0 bg-yellow-400 transition-all duration-1000 ease-linear"
+                  style={{ width: `${(secondsRemaining / 60) * 100}%` }}
+                />
+              </div>
+              <p className="text-yellow-400 text-sm font-mono">
+                Cooldown: {secondsRemaining}s
+              </p>
+            </div>
           )}
-          {submitStatus === "error" && (
-            <p className="text-red-400 text-center text-sm font-mono mt-4">
-              Transmission failed. Please try again.
-            </p>
+
+          {/* Error Message */}
+          {submitStatus === "error" && errorMessage && (
+            <div
+              role="alert"
+              aria-live="assertive"
+              className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-center text-sm font-mono"
+            >
+              {errorMessage}
+            </div>
           )}
         </form>
+
+        {/* Success Message Overlay */}
+        <div
+          ref={successRef}
+          className="absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <div className="text-center p-8 rounded-2xl enhanced-glass max-w-md">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-500/20 flex items-center justify-center">
+              <svg
+                className="w-8 h-8 text-emerald-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-display font-bold mb-2">Transmission Successful</h3>
+            <p className="text-zinc-400 font-mono text-sm">
+              Message received. I will respond shortly.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );

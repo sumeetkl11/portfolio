@@ -43,30 +43,59 @@ export default function ProjectsSlider() {
     }
 
     const slider = sliderTrackRef.current;
-    if (sectionRef.current && slider) {
-      // Calculate how far to scroll the slider track
+    const section = sectionRef.current;
+    if (section && slider) {
+      // Calculate how far to scroll the slider track so all cards + end buffer are viewed
       const getScrollAmount = () => {
         const sliderWidth = slider.scrollWidth;
         return -(sliderWidth - window.innerWidth);
       };
 
-      const tween = gsap.to(slider, {
-        x: getScrollAmount,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top top",
-          end: () => `+=${getScrollAmount() * -1}`,
-          pin: true,
-          scrub: 1,
-          invalidateOnRefresh: true,
-        }
-      });
+      const ctx = gsap.context(() => {
+        // Exact horizontal distance needed to bring the last card on-screen
+        const scrollDist = Math.abs(getScrollAmount());
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: "top top",
+            // scrollDist = full horizontal travel; extra 80vh = hold time at end
+            end: () => `+=${scrollDist + window.innerHeight * 0.8}`,
+            pin: true,
+            scrub: 1.2,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            // Only raise z-index while actually pinned so sections below aren't buried
+            onPin: () => { section.style.zIndex = "50"; },
+            onUnpin: () => { section.style.zIndex = ""; },
+          }
+        });
+
+        // Phase 1: slide all cards into view (takes up scrollDist worth of scroll)
+        tl.to(slider, {
+          x: () => getScrollAmount(),
+          ease: "none",
+          // proportion of total timeline = scrollDist / (scrollDist + hold)
+          duration: scrollDist / (scrollDist + window.innerHeight * 0.8),
+        })
+        // Phase 2: hold — user scrolls for 80vh while final card stays visible
+        .to({}, {
+          duration: (window.innerHeight * 0.8) / (scrollDist + window.innerHeight * 0.8),
+        });
+      }, sectionRef);
       
-      // Cleanup
+      document.fonts.ready.then(() => {
+        ScrollTrigger.refresh();
+      });
+
+      const handleResize = () => {
+        ScrollTrigger.refresh();
+      };
+      window.addEventListener("resize", handleResize);
+
       return () => {
-        tween.kill();
-        ScrollTrigger.getAll().forEach(t => t.kill());
+        window.removeEventListener("resize", handleResize);
+        ctx.revert();
       };
     }
   }, []);
@@ -77,7 +106,7 @@ export default function ProjectsSlider() {
         {/* Subtle grid background */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
-        <div className="w-full px-6 md:px-12 relative z-10 mb-12">
+        <div className="w-full px-6 md:px-12 relative z-10 mb-6 md:mb-8">
           <h2 ref={titleRef} className="text-4xl md:text-5xl lg:text-7xl font-display font-bold uppercase tracking-wider">
             Projects
           </h2>
@@ -86,13 +115,13 @@ export default function ProjectsSlider() {
         <div className="relative z-10 w-full overflow-visible">
           <div 
             ref={sliderTrackRef} 
-            className="flex gap-8 px-6 md:px-12 w-max"
+            className="flex gap-8 px-6 md:px-12 w-max items-stretch"
           >
             {projects.map((project, i) => (
               <div
                 key={project.id}
                 onClick={() => setSelectedProject(project)}
-                className="group relative w-[85vw] sm:w-[60vw] md:w-[45vw] lg:w-[35vw] h-[50vh] md:h-[60vh] rounded-3xl overflow-hidden cursor-none glass-panel border border-white/5 transition-colors duration-500 hover:border-white/20 bg-zinc-900/50 flex flex-col justify-between p-8"
+                className="group relative w-[85vw] sm:w-[60vw] md:w-[45vw] lg:w-[35vw] h-[55vh] min-h-[460px] max-h-[580px] rounded-3xl overflow-hidden cursor-none glass-panel border border-white/5 transition-colors duration-500 hover:border-white/20 bg-zinc-900/50 flex flex-col justify-between p-6 md:p-8"
                 data-cursor="project"
                 data-cursor-text="View Project"
               >
@@ -105,30 +134,30 @@ export default function ProjectsSlider() {
                 </div>
 
                 <div className="relative z-10">
-                  <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest block mb-4">
+                  <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest block mb-3">
                     {project.category}
                   </span>
-                  <h3 className="text-3xl md:text-4xl font-bold tracking-tight mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-zinc-500 transition-all duration-500">
+                  <h3 className="text-2xl md:text-3xl font-bold tracking-tight mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-zinc-500 transition-all duration-500">
                     {project.title}
                   </h3>
 
-                  <p className="text-zinc-400 text-sm md:text-base line-clamp-3 mb-6 transition-colors duration-500 group-hover:text-zinc-300">
+                  <p className="text-zinc-400 text-xs md:text-sm line-clamp-3 mb-4 transition-colors duration-500 group-hover:text-zinc-300">
                     {project.description}
                   </p>
 
                   {project.metrics && (
-                    <div className="flex flex-col gap-2 mb-4">
+                    <div className="grid grid-cols-2 gap-2 mb-4 p-2.5 rounded-lg bg-white/[0.03] border border-white/5 font-mono">
                       {project.metrics.map((metric, idx) => (
-                        <div key={idx} className="flex items-center gap-2 text-xs font-mono">
-                          <span className="text-zinc-500">{metric.label}:</span>
-                          <span className="text-zinc-300 font-semibold group-hover:text-white transition-colors duration-500">{metric.value}</span>
+                        <div key={idx} className="flex flex-col">
+                          <span className="text-[10px] text-zinc-500 uppercase tracking-wider">{metric.label}:</span>
+                          <span className="text-xs text-zinc-300 font-semibold group-hover:text-white transition-colors duration-500">{metric.value}</span>
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
 
-                <div className="relative z-10 mt-auto pt-4 flex flex-col gap-4">
+                <div className="relative z-10 mt-auto pt-4 flex flex-col gap-3">
                   <div className="flex flex-wrap gap-2">
                     {project.techStack.slice(0, 4).map((tech) => (
                       <span key={tech} className="text-[10px] uppercase font-mono tracking-wider px-2 py-1 rounded bg-white/5 text-zinc-400 border border-white/5">
@@ -142,7 +171,7 @@ export default function ProjectsSlider() {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-6 pt-4 border-t border-white/10 mt-2">
+                  <div className="flex items-center gap-6 pt-3 border-t border-white/10 mt-1">
                     {project.repoUrl && (
                       <a
                         href={project.repoUrl}
@@ -173,6 +202,8 @@ export default function ProjectsSlider() {
                 </div>
               </div>
             ))}
+            {/* Trailing Buffer Spacer */}
+            <div className="w-[12vw] md:w-[18vw] flex-shrink-0" />
           </div>
         </div>
       </section>

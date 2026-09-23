@@ -61,7 +61,7 @@ export default function Projects() {
           Selected Works
         </h2>
 
-        <div ref={projectsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div ref={projectsRef} className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {projects.map((project) => (
             <div
               key={project.id}
@@ -78,9 +78,25 @@ export default function Projects() {
                   {project.title}
                 </h3>
                 <p className="text-sm text-zinc-400 leading-relaxed">
-                  {project.tagline}
+                  {project.description || project.tagline}
                 </p>
               </div>
+
+              {/* Key Metrics */}
+              {project.metrics && project.metrics.length > 0 && (
+                <div className="grid grid-cols-2 gap-3 mb-6 p-3.5 rounded-xl bg-white/[0.03] border border-white/5 font-mono">
+                  {project.metrics.map((metric, i) => (
+                    <div key={i} className="flex flex-col">
+                      <span className="text-[10px] uppercase tracking-wider text-zinc-500">
+                        {metric.label}
+                      </span>
+                      <span className="text-xs font-semibold text-zinc-200 mt-0.5">
+                        {metric.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div className="mt-auto pt-6 border-t border-white/5">
                 <div className="flex flex-wrap gap-2 mb-6">
@@ -109,7 +125,7 @@ export default function Projects() {
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 text-sm font-medium hover:text-zinc-300 transition-colors"
                     >
-                      <Code2 className="w-4 h-4" /> Source Code
+                      <Code2 className="w-4 h-4" /> Code
                     </a>
                   )}
                 </div>

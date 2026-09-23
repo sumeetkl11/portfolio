@@ -19,6 +19,20 @@ const cinzel = Cinzel({
 export const metadata: Metadata = {
   title: "Sumeet Kanhiya | Systems Architect",
   description: "Personal portfolio of Sumeet Kanhiya, Systems Architect & Full-Stack Developer",
+  openGraph: {
+    title: "Sumeet Kanhiya | Systems Architect",
+    description: "Personal portfolio of Sumeet Kanhiya, Systems Architect & Full-Stack Developer",
+    url: "https://sumeetkanhiya.dev",
+    siteName: "Sumeet Kanhiya",
+    images: [{ url: "/og-cover.jpg", width: 1200, height: 630, alt: "Sumeet Kanhiya Portfolio" }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sumeet Kanhiya | Systems Architect",
+    description: "Personal portfolio of Sumeet Kanhiya, Systems Architect & Full-Stack Developer",
+    images: ["/og-cover.jpg"],
+  },
 };
 
 export default function RootLayout({

@@ -28,9 +28,15 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Force hide system cursor for custom cursor implementation */
-  *, *::before, *::after, a, button, input, textarea, select {
-    cursor: none !important;
+  /* Hide system cursor — custom cursor handles pointer devices; touch devices are exempt */
+  html, body {
+    cursor: none;
+  }
+
+  /* Restore focus-visible outlines for keyboard navigation (WCAG 2.4.7) */
+  :focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.6);
+    outline-offset: 3px;
   }
 
   /* Lenis recommended CSS */
@@ -60,8 +66,33 @@
   .glass-panel {
     @apply bg-black/40 backdrop-blur-md border border-white/10;
   }
-  
+
+  .enhanced-glass {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.03) 100%
+    );
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+      0 8px 32px 0 rgba(0, 0, 0, 0.37),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  }
+
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50;
+  }
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

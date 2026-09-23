@@ -146,7 +146,7 @@ export default function ProfileHero() {
         <div ref={marqueeRef} className="flex whitespace-nowrap min-w-max animate-marquee">
           {[...marqueeSkills, ...marqueeSkills, ...marqueeSkills, ...marqueeSkills].map((skill, index) => (
             <span
-              key={index}
+              key={`${skill}-${index}`}
               className="inline-flex items-center text-xs md:text-sm font-mono font-bold tracking-widest uppercase mx-6"
             >
               <span>{skill}</span>
