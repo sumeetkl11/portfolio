@@ -30,6 +30,12 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
 
     const shouldFloat = isFocused || hasValue;
 
+    useEffect(() => {
+      if (props.value !== undefined) {
+        setHasValue(Boolean(props.value));
+      }
+    }, [props.value]);
+
     // Merge refs
     const mergedRef = (node: HTMLTextAreaElement) => {
       (autoResizeRef as any).current = node;
@@ -92,7 +98,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
     };
 
     return (
-      <div className="relative">
+      <div className={`relative transition-all ${isFocused ? "z-20" : "z-10"}`}>
         <div
           ref={containerRef}
           className={`relative rounded-lg transition-all ${stateClasses} ${className}`}
@@ -112,9 +118,13 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
           <label
             ref={labelRef}
             htmlFor={props.id}
-            className={`absolute left-4 font-mono uppercase tracking-widest text-xs pointer-events-none transition-all origin-left ${
-              shouldFloat ? "-translate-y-7 scale-85 text-zinc-400" : "top-4 text-zinc-500"
-            } ${Icon ? "left-12" : "left-4"}`}
+            className={`absolute font-mono uppercase tracking-widest text-xs pointer-events-none transition-all duration-200 ease-out origin-left z-20 ${
+              Icon ? "left-12" : "left-4"
+            } ${
+              shouldFloat
+                ? "top-0 -translate-y-6 scale-85 text-zinc-400"
+                : "top-4 translate-y-0 text-zinc-500"
+            }`}
           >
             {label}
             {props.required && <span className="text-red-400 ml-1">*</span>}
@@ -132,9 +142,9 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
             aria-required={props.required}
             aria-invalid={!!error}
             aria-describedby={error ? `${props.id}-error` : undefined}
-            className={`w-full px-4 py-3 bg-transparent text-white placeholder:text-zinc-600 focus:outline-none transition-colors resize-none min-h-[120px] ${
+            className={`w-full px-4 py-3 bg-transparent text-white focus:outline-none transition-colors resize-none min-h-[120px] ${
               Icon ? "pl-12" : ""
-            } ${showCounter ? "pb-8" : ""}`}
+            } ${showCounter ? "pb-8" : ""} placeholder:text-zinc-600 placeholder:opacity-0 focus:placeholder:opacity-100 placeholder:transition-opacity placeholder:duration-200`}
             style={{ overflow: "hidden" }}
           />
 
@@ -167,7 +177,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
             id={`${props.id}-error`}
             role="alert"
             aria-live="polite"
-            className="text-red-400 text-xs mt-2 font-mono"
+            className="text-red-400 text-xs mt-1.5 font-mono"
           >
             {error}
           </p>

@@ -165,7 +165,7 @@ export default function Contact() {
         <form
           ref={formRef}
           onSubmit={handleSubmit(onSubmit)}
-          className="space-y-6"
+          className="space-y-8"
           noValidate
         >
           {/* Honeypot field (hidden) */}
@@ -182,7 +182,7 @@ export default function Contact() {
           {/* Name & Email Row */}
           <div
             ref={(el) => { fieldsRef.current[0] = el; }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6 opacity-0"
+            className="grid grid-cols-1 md:grid-cols-2 gap-6 opacity-0 relative z-10"
           >
             <FormInput
               {...register("name", {
@@ -191,7 +191,7 @@ export default function Contact() {
               id="name"
               type="text"
               label="Name"
-              placeholder=""
+              placeholder="Enter your name"
               icon={User}
               error={errors.name?.message}
               isValid={Boolean(isNameValid)}
@@ -205,7 +205,7 @@ export default function Contact() {
               id="email"
               type="email"
               label="Email"
-              placeholder=""
+              placeholder="example.at@gmail.com"
               icon={Mail}
               error={errors.email?.message}
               isValid={Boolean(isEmailValid)}
@@ -216,7 +216,7 @@ export default function Contact() {
           {/* Message Field */}
           <div
             ref={(el) => { fieldsRef.current[1] = el; }}
-            className="opacity-0"
+            className="opacity-0 relative z-10"
           >
             <FormTextarea
               {...register("message", {

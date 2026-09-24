@@ -24,6 +24,12 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
     const shouldFloat = isFocused || hasValue;
 
     useEffect(() => {
+      if (props.value !== undefined) {
+        setHasValue(Boolean(props.value));
+      }
+    }, [props.value]);
+
+    useEffect(() => {
       if (containerRef.current) {
         animateFocusGlow(containerRef.current, isFocused);
       }
@@ -66,7 +72,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       : "border-white/10 bg-white/5";
 
     return (
-      <div className="relative">
+      <div className={`relative transition-all ${isFocused ? "z-20" : "z-10"}`}>
         <div
           ref={containerRef}
           className={`relative rounded-lg transition-all ${stateClasses} ${className}`}
@@ -86,9 +92,13 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
           <label
             ref={labelRef}
             htmlFor={props.id}
-            className={`absolute left-4 font-mono uppercase tracking-widest text-xs pointer-events-none transition-all origin-left ${
-              shouldFloat ? "-translate-y-7 scale-85 text-zinc-400" : "top-1/2 -translate-y-1/2 text-zinc-500"
-            } ${Icon ? "left-12" : "left-4"}`}
+            className={`absolute font-mono uppercase tracking-widest text-xs pointer-events-none transition-all duration-200 ease-out origin-left z-20 ${
+              Icon ? "left-12" : "left-4"
+            } ${
+              shouldFloat
+                ? "top-0 -translate-y-6 scale-85 text-zinc-400"
+                : "top-1/2 -translate-y-1/2 text-zinc-500"
+            }`}
           >
             {label}
             {props.required && <span className="text-red-400 ml-1">*</span>}
@@ -105,9 +115,9 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             aria-required={props.required}
             aria-invalid={!!error}
             aria-describedby={error ? `${props.id}-error` : undefined}
-            className={`w-full px-4 py-3 bg-transparent text-white placeholder:text-zinc-600 focus:outline-none transition-colors ${
+            className={`w-full px-4 py-3 bg-transparent text-white focus:outline-none transition-colors ${
               Icon ? "pl-12" : ""
-            } ${isValid ? "pr-12" : ""}`}
+            } ${isValid ? "pr-12" : ""} placeholder:text-zinc-600 placeholder:opacity-0 focus:placeholder:opacity-100 placeholder:transition-opacity placeholder:duration-200`}
           />
 
           {/* Valid Checkmark */}
@@ -127,7 +137,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             id={`${props.id}-error`}
             role="alert"
             aria-live="polite"
-            className="text-red-400 text-xs mt-2 font-mono"
+            className="text-red-400 text-xs mt-1.5 font-mono"
           >
             {error}
           </p>

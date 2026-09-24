@@ -23,22 +23,7 @@ export const projects: Project[] = [
       { label: "Ingress Latency", value: "<25ms" },
       { label: "DLQ Remediation", value: "50 req/s" }
     ],
-    liveUrl: "https://github.com/sumeetkl11/FaultFlow_WebHook",
     repoUrl: "https://github.com/sumeetkl11/FaultFlow_WebHook",
-  },
-  {
-    id: "sock-io",
-    title: "Sock.io",
-    category: "WEBRTC · REAL-TIME",
-    tagline: "Peer-to-peer binary streaming engine and real-time messaging hub.",
-    description: "Full-stack communication suite combining low-latency WebSocket messaging with WebRTC peer-to-peer audio calls and STUN NAT traversal. Backed by MongoDB Atlas, a Redis adapter for multi-instance socket mapping, and IndexedDB for offline-first message queues.",
-    techStack: ["React 19", "Node.js", "Socket.io", "WebRTC", "MongoDB", "Redis", "PWA"],
-    metrics: [
-      { label: "WebSocket Sync", value: "<24ms P99" },
-      { label: "Concurrent Scale", value: "500+ users" }
-    ],
-    liveUrl: "https://github.com/sumeetkl11/Sock.io",
-    repoUrl: "https://github.com/sumeetkl11/Sock.io",
   },
   {
     id: "chefcraft",
@@ -51,7 +36,7 @@ export const projects: Project[] = [
       { label: "Generation Latency", value: "<2s" },
       { label: "Retrieval Speedup", value: "+25%" }
     ],
-    liveUrl: "https://github.com/sumeetkl11/ChefCraft",
+    liveUrl: "https://chef-craft.vercel.app/",
     repoUrl: "https://github.com/sumeetkl11/ChefCraft",
   },
   {
@@ -65,8 +50,22 @@ export const projects: Project[] = [
       { label: "Concurrent Scale", value: "500+ users" },
       { label: "Integrated Modules", value: "4 suites" }
     ],
-    liveUrl: "https://github.com/sumeetkl11/Linkforge",
+    liveUrl: "https://linkforge-mauve.vercel.app/",
     repoUrl: "https://github.com/sumeetkl11/Linkforge",
+  },
+  {
+    id: "sock-io",
+    title: "Sock.io",
+    category: "WEBRTC · REAL-TIME",
+    tagline: "Peer-to-peer binary streaming engine and real-time messaging hub.",
+    description: "Full-stack communication suite combining low-latency WebSocket messaging with WebRTC peer-to-peer audio calls and STUN NAT traversal. Backed by MongoDB Atlas, a Redis adapter for multi-instance socket mapping, and IndexedDB for offline-first message queues.",
+    techStack: ["React 19", "Node.js", "Socket.io", "WebRTC", "MongoDB", "Redis", "PWA"],
+    metrics: [
+      { label: "WebSocket Sync", value: "<24ms P99" },
+      { label: "Concurrent Scale", value: "500+ users" }
+    ],
+    liveUrl: "https://sock-io.onrender.com/",
+    repoUrl: "https://github.com/sumeetkl11/Sock.io",
   }
 ];
 

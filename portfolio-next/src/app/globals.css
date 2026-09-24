@@ -59,6 +59,12 @@
   .lenis.lenis-scrolling iframe {
     pointer-events: none;
   }
+
+  /* Smooth transition for input and textarea placeholders */
+  input::placeholder,
+  textarea::placeholder {
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 }
 
 /* Utilities for noise or glass */
