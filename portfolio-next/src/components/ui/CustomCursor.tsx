@@ -9,11 +9,17 @@ export default function CustomCursor() {
   const cursorDotRef = useRef<HTMLDivElement>(null);
   const isHoveringRef = useRef(false);
   const isVisibleRef = useRef(false);
+  const isKeyboardModeRef = useRef(false);
   const pathname = usePathname();
 
   useEffect(() => {
     // Don't activate on touch / mobile devices
     if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) {
+      return;
+    }
+
+    // Don't activate if user prefers reduced motion
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
 
@@ -65,6 +71,10 @@ export default function CustomCursor() {
     };
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (isKeyboardModeRef.current) {
+        isKeyboardModeRef.current = false;
+        document.documentElement.classList.remove("keyboard-nav");
+      }
       showCursor();
       xTo(e.clientX);
       yTo(e.clientY);
@@ -85,9 +95,9 @@ export default function CustomCursor() {
 
       if (isInteractive && !isHoveringRef.current) {
         isHoveringRef.current = true;
-        // Smooth scale-up on interactive elements
+        // Smooth scale-up on interactive elements without clipping
         gsap.to(cursorDot, {
-          scale: 1.35,
+          scale: 1.22,
           duration: 0.25,
           ease: "power2.out",
           overwrite: "auto",
@@ -122,12 +132,23 @@ export default function CustomCursor() {
       hideCursor();
     };
 
+    // Keyboard navigation detection
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Tab key indicates keyboard navigation
+      if (e.key === "Tab") {
+        isKeyboardModeRef.current = true;
+        document.documentElement.classList.add("keyboard-nav");
+        hideCursor();
+      }
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseover", handleMouseOver);
     document.addEventListener("mouseleave", handleDocMouseLeave);
     document.addEventListener("mouseenter", handleDocMouseEnter);
     document.addEventListener("mouseout", handleMouseLeave);
     window.addEventListener("blur", handleWindowBlur);
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
@@ -136,6 +157,8 @@ export default function CustomCursor() {
       document.removeEventListener("mouseenter", handleDocMouseEnter);
       document.removeEventListener("mouseout", handleMouseLeave);
       window.removeEventListener("blur", handleWindowBlur);
+      window.removeEventListener("keydown", handleKeyDown);
+      document.documentElement.classList.remove("keyboard-nav");
     };
   }, []);
 
@@ -150,7 +173,7 @@ export default function CustomCursor() {
   return (
     <div
       ref={cursorRef}
-      className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center overflow-hidden opacity-0"
+      className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center opacity-0"
       style={{
         width: 48,
         height: 48,

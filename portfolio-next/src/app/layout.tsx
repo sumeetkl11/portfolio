@@ -5,6 +5,8 @@ import SmoothScroll from "@/components/layout/SmoothScroll";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CustomCursor from "@/components/ui/CustomCursor";
+import { ResumeModalProvider } from "@/context/ResumeModalContext";
+import ResumeModal from "@/components/ui/ResumeModal";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -17,6 +19,7 @@ const cinzel = Cinzel({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://sumeetkanhiya.dev"),
   title: "Sumeet Kanhiya | Systems Architect",
   description: "Personal portfolio of Sumeet Kanhiya, Systems Architect & Full-Stack Developer",
   openGraph: {
@@ -43,12 +46,15 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.variable} ${cinzel.variable} font-sans antialiased bg-black text-white selection:bg-white/30 cursor-none`}>
-        <CustomCursor />
-        <SmoothScroll>
-          <Navbar />
-          {children}
-          <Footer />
-        </SmoothScroll>
+        <ResumeModalProvider>
+          <CustomCursor />
+          <SmoothScroll>
+            <Navbar />
+            {children}
+            <Footer />
+          </SmoothScroll>
+          <ResumeModal />
+        </ResumeModalProvider>
       </body>
     </html>
   );

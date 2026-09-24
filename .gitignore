@@ -1,3 +1,21 @@
 extra/
 cv/
 .claude/
+
+# Documentation and audit files
+AUDIT_*.md
+COMPREHENSIVE_AUDIT_REPORT.md
+PROJECT_INVENTORY.md
+REVIEW_RATING_SYSTEM.md
+*_GUIDE.md
+*GUIDE*.md
+
+# Video files (host separately or add later)
+*.mp4
+*.webm
+
+# Scripts and batch files
+*.bat
+
+# Temp files
+.DS_Store

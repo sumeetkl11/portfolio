@@ -13,10 +13,11 @@ export const contactFormSchema = z.object({
     .string()
     .min(10, "Message must be at least 10 characters")
     .max(1000, "Message must be under 1000 characters"),
-  website: z.string().max(0, "Invalid submission"), // Honeypot field
+  website: z.string().max(0, "Invalid submission").optional().default(""), // Honeypot field
 });
 
-export type ContactFormData = z.infer<typeof contactFormSchema>;
+export type ContactFormInput = z.input<typeof contactFormSchema>;
+export type ContactFormData = z.output<typeof contactFormSchema>;
 
 export type FormStatus = "idle" | "submitting" | "success" | "error" | "rate-limited";
 export type FieldState = "idle" | "focused" | "valid" | "invalid" | "disabled";

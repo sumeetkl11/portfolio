@@ -3,12 +3,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User, Mail, MessageSquare } from "lucide-react";
+import { User, Mail, MessageSquare, ArrowUpRight } from "lucide-react";
+import { profile } from "@/lib/data";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import { FormInput, FormTextarea, FormButton } from "@/components/ui/form";
-import { contactFormSchema, ContactFormData, FormStatus } from "@/lib/formValidation";
+import { contactFormSchema, ContactFormData, ContactFormInput, FormStatus } from "@/lib/formValidation";
 import { useRateLimitTimer } from "@/hooks/useRateLimitTimer";
 import { animateFieldEntry, animateFormSuccess } from "@/hooks/useFormAnimation";
 
@@ -34,9 +35,15 @@ export default function Contact() {
     formState: { errors, isSubmitting },
     trigger,
     watch,
-  } = useForm<ContactFormData>({
+  } = useForm<ContactFormInput, any, ContactFormData>({
     resolver: zodResolver(contactFormSchema),
     mode: "onBlur",
+    defaultValues: {
+      name: "",
+      email: "",
+      message: "",
+      website: "",
+    },
   });
 
   // Watch form values for validation states
@@ -64,7 +71,7 @@ export default function Contact() {
     });
 
     // ScrollTrigger for visibility
-    ScrollTrigger.create({
+    const st = ScrollTrigger.create({
       trigger: sectionRef.current,
       start: "top 70%",
       once: true,
@@ -89,7 +96,7 @@ export default function Contact() {
     });
 
     return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      st.kill();
     };
   }, []);
 
@@ -112,7 +119,7 @@ export default function Contact() {
       }
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || "Failed to send message");
       }
 
@@ -125,7 +132,6 @@ export default function Contact() {
           setSubmitStatus("idle");
         });
       } else {
-        // Fallback if refs aren't ready
         setTimeout(() => {
           reset();
           setSubmitStatus("idle");
@@ -150,15 +156,31 @@ export default function Contact() {
 
       <div className="max-w-3xl mx-auto px-6 relative z-10">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-display font-bold uppercase tracking-wider mb-6">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-display font-bold uppercase tracking-wider mb-4">
             Get In Touch
           </h2>
-          <p className="text-zinc-400 text-lg">
+          <p className="text-zinc-400 text-lg mb-6">
             Have a project in mind or want to collaborate?
             <br />
-            Let's talk.
+            Let&apos;s talk.
           </p>
+
+          <div className="flex items-center justify-center gap-4">
+            <a
+              href={profile.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0077B5]/15 hover:bg-[#0077B5]/25 text-[#0077B5] hover:text-white border border-[#0077B5]/30 text-xs font-mono font-medium transition-all duration-300 hover:scale-105 group"
+              title="Connect with Sumeet on LinkedIn"
+            >
+              <svg className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
+                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+              </svg>
+              <span>Connect on LinkedIn</span>
+              <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+            </a>
+          </div>
         </div>
 
         {/* Form */}
@@ -306,7 +328,7 @@ export default function Contact() {
             </div>
             <h3 className="text-2xl font-display font-bold mb-2">Message Sent Successfully</h3>
             <p className="text-zinc-400 font-mono text-sm">
-              Thanks for reaching out! I'll get back to you soon.
+              Thanks for reaching out! I&apos;ll get back to you soon.
             </p>
           </div>
         </div>

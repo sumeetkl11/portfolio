@@ -5,7 +5,20 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { katanaSkills } from "@/lib/data";
-import KatanaScene from "@/components/ui/KatanaScene";
+import dynamic from "next/dynamic";
+
+// Lazy load Three.js component to reduce initial bundle by ~180KB
+const KatanaScene = dynamic(() => import("@/components/ui/KatanaScene"), {
+  loading: () => (
+    <div className="flex items-center justify-center w-full h-full">
+      <div className="text-center">
+        <div className="w-12 h-12 mx-auto mb-3 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+        <p className="text-sm font-mono text-zinc-400">Loading 3D Experience...</p>
+      </div>
+    </div>
+  ),
+  ssr: false,
+});
 
 gsap.registerPlugin(ScrollTrigger);
 

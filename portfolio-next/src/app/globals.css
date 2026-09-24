@@ -28,9 +28,22 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Force hide system cursor across all elements so OS cursor never overlaps custom cursor */
+  /* Hide system cursor for custom cursor (without !important to allow user overrides) */
   html, body, *, *::before, *::after {
-    cursor: none !important;
+    cursor: none;
+  }
+
+  /* Restore cursor for users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    html, body, *, *::before, *::after {
+      cursor: auto !important;
+    }
+  }
+
+  /* Show cursor during keyboard navigation */
+  html.keyboard-nav, html.keyboard-nav body, html.keyboard-nav *,
+  html.keyboard-nav *::before, html.keyboard-nav *::after {
+    cursor: auto !important;
   }
 
   /* Restore focus-visible outlines for keyboard navigation (WCAG 2.4.7) */
