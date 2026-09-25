@@ -3,9 +3,9 @@
 Welcome to the **Sumit Scrollytelling Portfolio** workspace.
 
 ## 🎯 Active Project Objective
-This workspace is building an Awwwards-level, Apple-grade, cinematic scrollytelling personal portfolio for **Sumit** (`sumit_scrollytelling_experience.md`).
+This workspace is building an Awwwards-level, Apple-grade, cinematic scrollytelling personal portfolio for **Sumit** ([docs/PROJECT_SPEC.md](file:///d:/coedes/protfolio/2nd%20-%20portfolio/docs/PROJECT_SPEC.md)).
 - **Visual Aesthetic**: Pure pitch-black void (`#000000`), edge-to-edge negative space, editorial typography, zero AI slop.
-- **Hero Interaction**: 40-frame scroll-scrubbed canvas animation located in `frames/` (`ezgif-frame-001.jpg` to `ezgif-frame-040.jpg`), synchronized with right-aligned narrative typography.
+- **Hero Interaction**: 192-frame scroll-scrubbed canvas animation located in `portfolio-next/public/frames/` (`ezgif-frame-001.jpg` to `ezgif-frame-192.jpg`), synchronized with right-aligned narrative typography.
 
 ---
 

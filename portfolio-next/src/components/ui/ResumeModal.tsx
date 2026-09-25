@@ -12,6 +12,7 @@ export default function ResumeModal() {
   const dialogRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<"pdf" | "text">("pdf");
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const resumeUrl = process.env.NEXT_PUBLIC_RESUME_URL || "/resume.pdf";
 
   // Close on Escape key
   useEffect(() => {
@@ -141,7 +142,7 @@ export default function ResumeModal() {
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
             <a
-              href="/resume.pdf"
+              href={resumeUrl}
               download="Sumeet_Kanhiya_CV.pdf"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white text-black text-xs font-medium hover:bg-zinc-200 transition-colors"
               title="Download CV PDF"
@@ -150,7 +151,7 @@ export default function ResumeModal() {
               <span className="hidden sm:inline">Download</span>
             </a>
             <a
-              href="/resume.pdf"
+              href={resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-medium border border-white/10 transition-colors"
@@ -174,7 +175,7 @@ export default function ResumeModal() {
           {activeTab === "pdf" ? (
             <div className="w-full h-full flex flex-col items-center justify-center">
               <object
-                data="/resume.pdf#toolbar=1&navpanes=0&scrollbar=1"
+                data={`${resumeUrl}#toolbar=1&navpanes=0&scrollbar=1`}
                 type="application/pdf"
                 className="w-full h-full border-none"
               >
@@ -188,7 +189,7 @@ export default function ResumeModal() {
                   </p>
                   <div className="flex gap-4">
                     <a
-                      href="/resume.pdf"
+                      href={resumeUrl}
                       download="Sumeet_Kanhiya_CV.pdf"
                       className="px-5 py-2.5 bg-white text-black text-xs font-bold rounded-xl hover:bg-zinc-200 transition-colors flex items-center gap-2"
                     >

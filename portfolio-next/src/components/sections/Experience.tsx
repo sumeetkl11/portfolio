@@ -108,7 +108,7 @@ export default function Experience() {
                   <span>Review CV</span>
                 </button>
                 <a
-                  href="/resume.pdf"
+                  href={process.env.NEXT_PUBLIC_RESUME_URL || "/resume.pdf"}
                   download="Sumeet_Kanhiya_CV.pdf"
                   className="flex-1 md:flex-initial px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-mono text-xs uppercase tracking-wider border border-white/15 transition-all flex items-center justify-center gap-2"
                 >

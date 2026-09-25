@@ -41,6 +41,8 @@ yarn-error.log*
 next-env.d.ts
 
 cv/
+*.pdf
+!public/resume.sample.pdf
 
 # Documentation and audit files
 AUDIT_*.md

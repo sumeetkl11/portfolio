@@ -1,21 +1,37 @@
-extra/
-cv/
-.claude/
+# ==============================================================================
+# Sumit Portfolio - Root .gitignore
+# ==============================================================================
 
-# Documentation and audit files
+# Sensitive personal files & credentials
+cv/
+*.pdf
+!portfolio-next/public/resume.sample.pdf
+.env*
+!.env.example
+
+# Large third-party reference repositories & local archives
+references/
+extra/
+katana_pic_png/
+frames_high_quality/
+
+# Local agent skills & runtime caches (kept on local disk for Antigravity)
+.agents/
+.agent/
+
+# Internal audit reports and reviews (kept in docs/internal/)
+docs/internal/
 AUDIT_*.md
 COMPREHENSIVE_AUDIT_REPORT.md
 PROJECT_INVENTORY.md
 REVIEW_RATING_SYSTEM.md
-*_GUIDE.md
-*GUIDE*.md
 
-# Video files (host separately or add later)
+# Video media files (streamed or hosted separately)
 *.mp4
 *.webm
 
-# Scripts and batch files
-*.bat
-
-# Temp files
+# Build & System artifacts
+.claude/
 .DS_Store
+Thumbs.db
+*.bat

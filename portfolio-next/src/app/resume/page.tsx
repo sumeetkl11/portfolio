@@ -16,6 +16,8 @@ export const metadata: Metadata = {
 };
 
 export default function ResumePage() {
+  const resumeUrl = process.env.NEXT_PUBLIC_RESUME_URL || "/resume.pdf";
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col selection:bg-white/20">
       {/* Top Bar Navigation */}
@@ -42,7 +44,7 @@ export default function ResumePage() {
               <span>LinkedIn</span>
             </a>
             <a
-              href="/resume.pdf"
+              href={resumeUrl}
               download="Sumeet_Kanhiya_CV.pdf"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-black text-xs md:text-sm font-semibold hover:bg-zinc-200 transition-colors shadow-lg shadow-white/10"
             >
@@ -73,7 +75,7 @@ export default function ResumePage() {
 
           <div className="flex items-center gap-3 text-xs font-mono">
             <a
-              href="/resume.pdf"
+              href={resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 transition-colors"
@@ -87,7 +89,7 @@ export default function ResumePage() {
         {/* Embedded PDF Viewer */}
         <div className="flex-1 w-full min-h-[78vh] rounded-2xl border border-white/15 bg-zinc-950/60 overflow-hidden shadow-2xl relative">
           <object
-            data="/resume.pdf#toolbar=1&navpanes=0&scrollbar=1"
+            data={`${resumeUrl}#toolbar=1&navpanes=0&scrollbar=1`}
             type="application/pdf"
             className="w-full h-full min-h-[78vh]"
           >
@@ -96,7 +98,7 @@ export default function ResumePage() {
                 Your browser doesn't support embedded PDFs.
               </p>
               <a
-                href="/resume.pdf"
+                href={resumeUrl}
                 download="Sumeet_Kanhiya_CV.pdf"
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black font-semibold text-xs uppercase tracking-wider hover:bg-zinc-200 transition-colors"
               >
