@@ -22,11 +22,19 @@ if (typeof setInterval !== 'undefined') {
 
 async function checkRateLimit(ip: string): Promise<{ limited: boolean; retryAfter: number }> {
   try {
-    // Try to use Vercel KV if available
-    if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-      const { kv } = await import("@vercel/kv");
+    const redisUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+    const redisToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+
+    // Use Upstash Redis when configured
+    if (redisUrl && redisToken) {
+      const { Redis } = await import("@upstash/redis");
+      const redis = new Redis({
+        url: redisUrl,
+        token: redisToken,
+      });
+
       const key = `ratelimit:contact:${ip}`;
-      const lastRequest = await kv.get<number>(key);
+      const lastRequest = await redis.get<number>(key);
 
       if (lastRequest) {
         const timeRemaining = Math.ceil((RATE_LIMIT_WINDOW - (Date.now() - lastRequest)) / 1000);
@@ -35,12 +43,12 @@ async function checkRateLimit(ip: string): Promise<{ limited: boolean; retryAfte
         }
       }
 
-      // Set new timestamp with TTL
-      await kv.set(key, Date.now(), { ex: Math.ceil(RATE_LIMIT_WINDOW / 1000) });
+      // Set new timestamp with TTL (60s)
+      await redis.set(key, Date.now(), { ex: Math.ceil(RATE_LIMIT_WINDOW / 1000) });
       return { limited: false, retryAfter: 0 };
     }
   } catch (error) {
-    console.warn("KV rate limiting failed, falling back to in-memory:", error);
+    console.warn("Upstash Redis rate limiting failed, falling back to in-memory:", error);
   }
 
   // Fallback to in-memory (with cleanup)
