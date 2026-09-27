@@ -18,6 +18,7 @@ interface KatanaSceneProps {
 function CoverflowController({
   skills,
   targetOffset,
+  activeIndex,
   hoveredIndex,
   onHoverStart,
   onHoverEnd,
@@ -25,6 +26,7 @@ function CoverflowController({
 }: {
   skills: Skill[];
   targetOffset: number;
+  activeIndex: number;
   hoveredIndex: number | null;
   onHoverStart: (index: number) => void;
   onHoverEnd: () => void;
@@ -34,14 +36,14 @@ function CoverflowController({
   const [currentOffset, setCurrentOffset] = useState(targetOffset);
 
   useFrame((_state, delta) => {
-    // Smooth frame-rate independent inertia interpolation
-    const lerpFactor = 1 - Math.pow(0.0001, delta);
+    // Responsive frame-rate independent inertia interpolation
+    const lerpFactor = 1 - Math.exp(-9 * delta);
     const prev = currentOffsetRef.current;
     const next = THREE.MathUtils.lerp(prev, targetOffset, lerpFactor);
 
     currentOffsetRef.current = next;
     // Re-render slot positions when moving
-    if (Math.abs(next - prev) > 0.0005) {
+    if (Math.abs(next - prev) > 0.0001) {
       setCurrentOffset(next);
     }
   });
@@ -68,7 +70,8 @@ function CoverflowController({
         // Scaled down model size to fit comfortably within the card height
         const scale = 2.4 * Math.max(0.55, 1.0 - 0.20 * absDelta);
 
-        const isCenter = absDelta < 0.45;
+        // Only the active selected Katana is centered and drawn
+        const isCenter = index === activeIndex;
 
         return (
           <KatanaModel
@@ -279,6 +282,7 @@ export default function KatanaScene({
           <CoverflowController
             skills={skills}
             targetOffset={targetOffset}
+            activeIndex={activeIndex}
             hoveredIndex={hoveredIndex}
             onHoverStart={(idx) => setHoveredIndex(idx)}
             onHoverEnd={() => setHoveredIndex(null)}
@@ -300,9 +304,8 @@ export default function KatanaScene({
               handleKatanaClick(activeIndex - 1);
             }
           }}
-          className={`pointer-events-auto w-11 h-11 md:w-13 md:h-13 rounded-full border border-white/10 bg-black/40 backdrop-blur-md flex items-center justify-center text-white/70 hover:text-white hover:border-white/30 hover:bg-white/5 transition-all duration-200 ${
-            activeIndex === 0 ? "opacity-30 cursor-not-allowed" : "cursor-pointer"
-          }`}
+          className={`pointer-events-auto w-11 h-11 md:w-13 md:h-13 rounded-full border border-white/10 bg-black/40 backdrop-blur-md flex items-center justify-center text-white/70 hover:text-white hover:border-white/30 hover:bg-white/5 transition-all duration-200 ${activeIndex === 0 ? "opacity-30 cursor-not-allowed" : "cursor-pointer"
+            }`}
           aria-label="Previous Mastery"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -319,9 +322,8 @@ export default function KatanaScene({
               handleKatanaClick(activeIndex + 1);
             }
           }}
-          className={`pointer-events-auto w-11 h-11 md:w-13 md:h-13 rounded-full border border-white/10 bg-black/40 backdrop-blur-md flex items-center justify-center text-white/70 hover:text-white hover:border-white/30 hover:bg-white/5 transition-all duration-200 ${
-            activeIndex === N - 1 ? "opacity-30 cursor-not-allowed" : "cursor-pointer"
-          }`}
+          className={`pointer-events-auto w-11 h-11 md:w-13 md:h-13 rounded-full border border-white/10 bg-black/40 backdrop-blur-md flex items-center justify-center text-white/70 hover:text-white hover:border-white/30 hover:bg-white/5 transition-all duration-200 ${activeIndex === N - 1 ? "opacity-30 cursor-not-allowed" : "cursor-pointer"
+            }`}
           aria-label="Next Mastery"
         >
           <ChevronRight className="w-5 h-5" />
@@ -346,11 +348,10 @@ export default function KatanaScene({
               aria-label={`Select ${skill.name}`}
             >
               <div
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  isActive
+                className={`h-1.5 rounded-full transition-all duration-300 ${isActive
                     ? "w-6 md:w-8 shadow-[0_0_10px_rgba(255,255,255,0.8)]"
                     : "w-2 md:w-2.5 bg-white/20 group-hover:bg-white/40"
-                }`}
+                  }`}
                 style={isActive ? { backgroundColor: skill.color, boxShadow: `0 0 12px ${skill.color}` } : undefined}
               />
             </button>

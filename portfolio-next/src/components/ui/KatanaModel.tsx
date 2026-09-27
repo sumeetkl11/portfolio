@@ -23,8 +23,8 @@ interface KatanaModelProps {
 const ARC_RADIUS = 3.880;
 const ARC_YC = -3.856;
 const ARC_ZC = -0.362;
-// Subtle unsheathe: exposes golden habaki collar and ~2.5 inches of steel
-const MAX_SUBTLE_DRAW = 0.22;
+// Subtle unsheathe: exposes golden habaki collar and cutting steel edge
+const MAX_SUBTLE_DRAW = 0.26;
 
 export default function KatanaModel({
   skill,
@@ -204,8 +204,8 @@ export default function KatanaModel({
     const a = anim.current;
     if (!swordGroup) return;
 
-    const t = 1 - Math.pow(0.001, delta);
-    const carouselLerp = 1 - Math.pow(0.0001, delta);
+    const t = 1 - Math.exp(-12 * delta);
+    const carouselLerp = 1 - Math.exp(-14 * delta);
 
     // ── Carousel position and scale smooth interpolation ──
     a.curX = THREE.MathUtils.lerp(a.curX, position[0], carouselLerp);
@@ -222,26 +222,24 @@ export default function KatanaModel({
       parentRef.current.scale.setScalar(a.curScale);
     }
 
-    // ── Refined Subtle Hover Unsheathe Logic ──
-    // Katana only unsheathes on direct hover
-    const shouldDraw = isHovered;
+    // ── Strictly the active center Katana is drawn (Instant, zero-lag response) ──
+    const shouldDraw = isCenter;
 
     if (shouldDraw) {
-      // Gentle lift
-      a.parentLift = 0.18;
-      // Subtle draw: exposes gold habaki and ~2.5 inches of steel
-      a.swordProgress = a._parentLift > 0.08 ? MAX_SUBTLE_DRAW : 0;
+      // Gentle lift and immediate synchronized blade reveal
+      a.parentLift = 0.20;
+      a.swordProgress = MAX_SUBTLE_DRAW;
     } else {
       a.swordProgress = 0;
       a.parentLift = 0;
     }
 
-    // Smooth lerping
+    // Responsive physics-based smooth lerping
     a._parentLift = THREE.MathUtils.lerp(a._parentLift, a.parentLift, t);
     a._swordProgress = THREE.MathUtils.lerp(a._swordProgress, a.swordProgress, t);
     a._glowIntensity = THREE.MathUtils.lerp(
       a._glowIntensity,
-      a._swordProgress > 0.06 ? 2.5 : 0,
+      a._swordProgress > 0.04 ? 2.5 : 0,
       t
     );
 

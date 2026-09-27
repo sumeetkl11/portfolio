@@ -113,7 +113,7 @@ export default function ProjectsSlider() {
         {/* Subtle grid background */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
-        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 relative z-10 mb-6 md:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="w-full px-6 md:px-12 relative z-10 mb-6 md:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-[#adc6ff] animate-pulse" />
