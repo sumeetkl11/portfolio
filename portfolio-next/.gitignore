@@ -43,6 +43,8 @@ next-env.d.ts
 cv/
 *.pdf
 !public/resume.sample.pdf
+!public/certificates/*.pdf
+!.env.example
 
 # Documentation and audit files
 AUDIT_*.md

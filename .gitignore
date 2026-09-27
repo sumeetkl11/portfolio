@@ -6,8 +6,11 @@
 cv/
 *.pdf
 !portfolio-next/public/resume.sample.pdf
+!portfolio-next/public/certificates/*.pdf
+certificate/
 .env*
 !.env.example
+!portfolio-next/.env.example
 
 # Large third-party reference repositories & local archives
 references/
@@ -25,6 +28,10 @@ AUDIT_*.md
 COMPREHENSIVE_AUDIT_REPORT.md
 PROJECT_INVENTORY.md
 REVIEW_RATING_SYSTEM.md
+CV_VS_PORTFOLIO_COMPARISON.md
+IMPLEMENTATION_COMPLETE.md
+IMPLEMENTATION_SUMMARY.md
+MODERNIZATION_PLAN.md
 
 # Video media files (streamed or hosted separately)
 *.mp4
