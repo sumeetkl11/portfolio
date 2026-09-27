@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { X, ArrowUpRight, Code2 } from "lucide-react";
 import { type Project } from "@/types";
+import { useLenis } from "@/components/layout/SmoothScroll";
 
 interface CinematicDialogProps {
   project: Project | null;
@@ -12,6 +13,7 @@ interface CinematicDialogProps {
 }
 
 export default function CinematicDialog({ project, isOpen, onClose }: CinematicDialogProps) {
+  const lenis = useLenis();
   const overlayRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -25,11 +27,18 @@ export default function CinematicDialog({ project, isOpen, onClose }: CinematicD
   }, [project]);
 
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
+    if (isOpen) {
+      lenis?.stop();
+      document.body.style.overflow = "hidden";
+    } else {
+      lenis?.start();
+      document.body.style.overflow = "";
+    }
     return () => {
+      lenis?.start();
       document.body.style.overflow = "";
     };
-  }, [isOpen]);
+  }, [isOpen, lenis]);
 
   useEffect(() => {
     if (isOpen) {
@@ -87,15 +96,17 @@ export default function CinematicDialog({ project, isOpen, onClose }: CinematicD
   return (
     <div
       ref={overlayRef}
+      data-lenis-prevent="true"
+      onWheel={(e) => e.stopPropagation()}
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-12 opacity-0 pointer-events-none bg-black/40"
       onClick={onClose}
     >
       <div
         ref={dialogRef}
+        data-lenis-prevent="true"
+        onWheel={(e) => e.stopPropagation()}
         className="w-full max-w-5xl bg-[#0a0a0a] border border-white/10 rounded-3xl overflow-hidden shadow-2xl relative max-h-full flex flex-col opacity-0"
         onClick={(e) => e.stopPropagation()}
-        // Disable custom cursor inside modal to allow normal interaction
-        data-cursor="none"
       >
         <button
           onClick={onClose}

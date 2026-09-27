@@ -114,8 +114,23 @@ export default function CertificateCard({
               <ExternalLink className="w-3 h-3" />
               View Certificate
             </span>
-            <div className="w-8 h-8 rounded-full bg-[#adc6ff]/10 group-hover:bg-[#adc6ff]/20 border border-[#adc6ff]/20 flex items-center justify-center transition-all group-hover:scale-110">
-              <ExternalLink className="w-3.5 h-3.5 text-[#adc6ff]" />
+            <div className="flex items-center gap-2">
+              {certification.verificationUrl && (
+                <a
+                  href={certification.verificationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-500/15 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-400 hover:text-emerald-300 text-[10px] font-mono transition-all z-20"
+                  title="Verify authentic credential on Credly"
+                >
+                  <ShieldCheck className="w-3 h-3" />
+                  <span>Verify Credly</span>
+                </a>
+              )}
+              <div className="w-8 h-8 rounded-full bg-[#adc6ff]/10 group-hover:bg-[#adc6ff]/20 border border-[#adc6ff]/20 flex items-center justify-center transition-all group-hover:scale-110">
+                <ExternalLink className="w-3.5 h-3.5 text-[#adc6ff]" />
+              </div>
             </div>
           </div>
         </div>

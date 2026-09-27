@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { X, Download, ExternalLink, ShieldCheck, Eye, Sparkles } from "lucide-react";
 import { Certification } from "@/types";
+import { useLenis } from "@/components/layout/SmoothScroll";
 
 interface CertificateModalProps {
   certification: Certification | null;
@@ -16,6 +17,7 @@ export default function CertificateModal({
   isOpen,
   onClose,
 }: CertificateModalProps) {
+  const lenis = useLenis();
   const overlayRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<"badge" | "full">("badge");
@@ -29,16 +31,19 @@ export default function CertificateModal({
       }
     };
     if (isOpen) {
+      lenis?.stop();
       document.body.style.overflow = "hidden";
       window.addEventListener("keydown", handleKeyDown);
     } else {
+      lenis?.start();
       document.body.style.overflow = "";
     }
     return () => {
+      lenis?.start();
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, lenis, onClose]);
 
   // Reset tab & loading state when certification changes
   useEffect(() => {
@@ -97,6 +102,8 @@ export default function CertificateModal({
   return (
     <div
       ref={overlayRef}
+      data-lenis-prevent="true"
+      onWheel={(e) => e.stopPropagation()}
       className="fixed inset-0 z-[150] flex items-center justify-center p-3 sm:p-5 md:p-8 bg-black/80 opacity-0 pointer-events-none"
       onClick={onClose}
       role="dialog"
@@ -105,9 +112,10 @@ export default function CertificateModal({
     >
       <div
         ref={dialogRef}
+        data-lenis-prevent="true"
+        onWheel={(e) => e.stopPropagation()}
         className="w-full max-w-4xl h-[90vh] max-h-[850px] bg-[#0d0d0f] border border-white/15 rounded-2xl md:rounded-3xl shadow-2xl flex flex-col overflow-hidden relative"
         onClick={(e) => e.stopPropagation()}
-        data-cursor="none"
       >
         {/* Top Header Bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 px-5 py-4 border-b border-white/10 bg-zinc-950/80 backdrop-blur-md relative z-20">
@@ -186,10 +194,13 @@ export default function CertificateModal({
                 href={certification.verificationUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#adc6ff]/15 hover:bg-[#adc6ff]/25 text-[#adc6ff] text-xs font-mono border border-[#adc6ff]/30 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30 text-xs font-mono transition-colors"
+                title="Verify authentic credential badge on Credly"
               >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>Verify</span>
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span className="hidden xs:inline">Verify Credly</span>
+                <span className="xs:hidden">Verify</span>
+                <ExternalLink className="w-3 h-3 opacity-70" />
               </a>
             )}
 

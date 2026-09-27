@@ -4,10 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { X, Download, ExternalLink, FileText, CheckCircle2, MapPin, Mail, Phone } from "lucide-react";
 import { useResumeModal } from "@/context/ResumeModalContext";
+import { useLenis } from "@/components/layout/SmoothScroll";
 import { profile, experiences, education, projects, katanaSkills } from "@/lib/data";
 
 export default function ResumeModal() {
   const { isOpen, closeResumeModal } = useResumeModal();
+  const lenis = useLenis();
   const overlayRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<"pdf" | "text">("pdf");
@@ -25,13 +27,20 @@ export default function ResumeModal() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, closeResumeModal]);
 
-  // Lock scroll when open
+  // Lock scroll and pause Lenis smooth-scroll when open
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
+    if (isOpen) {
+      lenis?.stop();
+      document.body.style.overflow = "hidden";
+    } else {
+      lenis?.start();
+      document.body.style.overflow = "";
+    }
     return () => {
+      lenis?.start();
       document.body.style.overflow = "";
     };
-  }, [isOpen]);
+  }, [isOpen, lenis]);
 
   // GSAP animation
   useEffect(() => {
@@ -85,14 +94,17 @@ export default function ResumeModal() {
   return (
     <div
       ref={overlayRef}
+      data-lenis-prevent="true"
+      onWheel={(e) => e.stopPropagation()}
       className="fixed inset-0 z-[150] flex items-center justify-center p-3 sm:p-5 md:p-8 bg-black/75 opacity-0 pointer-events-none"
       onClick={closeResumeModal}
     >
       <div
         ref={dialogRef}
+        data-lenis-prevent="true"
+        onWheel={(e) => e.stopPropagation()}
         className="w-full max-w-5xl h-[92vh] max-h-[900px] bg-[#09090b] border border-white/15 rounded-2xl md:rounded-3xl shadow-2xl flex flex-col overflow-hidden relative"
         onClick={(e) => e.stopPropagation()}
-        data-cursor="none"
       >
         {/* Top Header Bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 px-5 py-4 border-b border-white/10 bg-zinc-950/80 backdrop-blur-md relative z-20">
@@ -207,7 +219,11 @@ export default function ResumeModal() {
               </object>
             </div>
           ) : (
-            <div className="w-full h-full overflow-y-auto p-6 md:p-10 font-sans text-zinc-300 selection:bg-white/20">
+            <div
+              className="w-full h-full overflow-y-auto p-6 md:p-10 font-sans text-zinc-300 selection:bg-white/20"
+              data-lenis-prevent="true"
+              onWheel={(e) => e.stopPropagation()}
+            >
               <div className="max-w-3xl mx-auto space-y-8">
                 {/* Header Profile Info */}
                 <div className="border-b border-white/10 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
