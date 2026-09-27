@@ -229,7 +229,7 @@ export default function KatanaScene({
     <div
       ref={containerRef}
       data-lenis-prevent="true"
-      className="relative w-full h-full select-none cursor-grab active:cursor-grabbing"
+      className="relative w-full h-full select-none cursor-none"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}

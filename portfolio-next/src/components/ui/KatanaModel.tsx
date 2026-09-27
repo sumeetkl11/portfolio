@@ -223,8 +223,8 @@ export default function KatanaModel({
     }
 
     // ── Refined Subtle Hover Unsheathe Logic ──
-    // Subtle unsheathe triggers on hover or when cleanly centered
-    const shouldDraw = isHovered || (isCenter && Math.abs(slotDelta) < 0.18);
+    // Katana only unsheathes on direct hover
+    const shouldDraw = isHovered;
 
     if (shouldDraw) {
       // Gentle lift

@@ -154,7 +154,7 @@ export default function Contact() {
       {/* Background decoration */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent pointer-events-none" />
 
-      <div className="max-w-3xl mx-auto px-6 relative z-10">
+      <div className="max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-display font-bold uppercase tracking-wider mb-4">

@@ -91,7 +91,7 @@ export default function CustomCursor() {
       }
 
       // Check if hovering over any clickable / interactive element
-      const isInteractive = target.closest("a, button, [role='button'], .project-card, [data-cursor]");
+      const isInteractive = target.closest("a, button, [role='button'], .project-card, [data-cursor], input, textarea, select, [contenteditable='true']");
 
       if (isInteractive && !isHoveringRef.current) {
         isHoveringRef.current = true;
@@ -173,7 +173,7 @@ export default function CustomCursor() {
   return (
     <div
       ref={cursorRef}
-      className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center opacity-0"
+      className="fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center opacity-0 cursor-none"
       style={{
         width: 48,
         height: 48,

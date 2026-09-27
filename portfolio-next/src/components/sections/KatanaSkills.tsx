@@ -77,10 +77,10 @@ export default function KatanaSkills() {
   }, { scope: containerRef });
 
   return (
-    <section 
+    <section
       ref={containerRef}
-      id="skills" 
-      className="relative z-20 w-full py-16 md:py-24 bg-black text-white flex flex-col items-center justify-center border-t border-white/5 overflow-hidden select-none"
+      id="skills"
+      className="relative z-20 w-full py-30 md:py-40 bg-black text-white flex flex-col items-center justify-center border-t border-white/5 overflow-hidden select-none"
     >
       {/* Cinematic subtle vignette backdrop */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(25,25,30,0.5)_0%,rgba(0,0,0,1)_80%)] pointer-events-none z-0" />
@@ -150,9 +150,9 @@ export default function KatanaSkills() {
           </div>
 
           {/* ── 3D Scene (Positioned cleanly across card) ── */}
-          <div className="absolute inset-0 w-full h-full z-10">
-            <KatanaScene 
-              skills={katanaSkills} 
+          <div className="absolute inset-0 w-full h-full z-10 cursor-none">
+            <KatanaScene
+              skills={katanaSkills}
               activeIndex={activeIndex}
               onActiveChange={setActiveIndex}
             />

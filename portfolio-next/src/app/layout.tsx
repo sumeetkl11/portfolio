@@ -1,21 +1,25 @@
 import type { Metadata } from "next";
-import { Inter, Cinzel } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/layout/SmoothScroll";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CustomCursor from "@/components/ui/CustomCursor";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import { ResumeModalProvider } from "@/context/ResumeModalContext";
 import ResumeModal from "@/components/ui/ResumeModal";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const cinzel = Cinzel({
-  variable: "--font-cinzel",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -45,7 +49,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${cinzel.variable} font-sans antialiased bg-black text-white selection:bg-white/30 cursor-none`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased bg-[#0a0a0b] text-white selection:bg-white/30 cursor-none`}>
+        <LoadingScreen />
         <ResumeModalProvider>
           <CustomCursor />
           <SmoothScroll>

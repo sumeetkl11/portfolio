@@ -99,15 +99,23 @@ export default function ProfileHero() {
           <div className="profile-stagger flex flex-wrap items-center gap-3 md:gap-4 mb-7">
             <a
               href="#projects"
-              className="px-6 sm:px-8 py-3.5 bg-white hover:bg-zinc-200 text-black font-bold uppercase tracking-wider text-xs md:text-sm rounded-xl transition-all duration-300 transform hover:-translate-y-0.5 shadow-lg shadow-white/10 flex items-center gap-2"
+              className="px-6 sm:px-8 py-3.5 bg-white hover:bg-zinc-200 text-black font-bold uppercase tracking-wider text-xs md:text-sm rounded-xl transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-[0_0_15px_rgba(173,198,255,0.5)] shadow-lg shadow-white/10 flex items-center gap-2 active:scale-[0.98]"
             >
               <span>Explore Projects</span>
               <ArrowDownRight className="w-4 h-4" />
             </a>
 
+            <button
+              onClick={openResumeModal}
+              className="px-6 sm:px-8 py-3.5 bg-[#adc6ff] hover:bg-[#8eb3ff] text-black font-bold uppercase tracking-wider text-xs md:text-sm rounded-xl transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-[0_0_15px_rgba(173,198,255,0.5)] shadow-lg shadow-[#adc6ff]/20 flex items-center gap-2 active:scale-[0.98]"
+            >
+              <FileText className="w-4 h-4" />
+              <span>View Resume</span>
+            </button>
+
             <a
               href="#contact"
-              className="px-6 sm:px-8 py-3.5 bg-zinc-900/90 hover:bg-zinc-800 text-white font-medium uppercase tracking-wider text-xs md:text-sm rounded-xl border border-white/20 hover:border-white/40 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center gap-2"
+              className="px-6 sm:px-8 py-3.5 bg-zinc-900/90 hover:bg-zinc-800 text-white font-medium uppercase tracking-wider text-xs md:text-sm rounded-xl border border-white/20 hover:border-white/40 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center gap-2 active:scale-[0.98]"
             >
               <Terminal className="w-4 h-4 text-zinc-400" />
               <span>Get in Touch</span>
@@ -116,26 +124,12 @@ export default function ProfileHero() {
 
           {/* Credentials & Social Channels */}
           <div className="profile-stagger flex flex-wrap items-center gap-3">
-            {/* Interactive CV Trigger - Compact, Aesthetic & Informative */}
-            <button
-              onClick={openResumeModal}
-              className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/15 text-zinc-200 hover:text-white border border-white/10 hover:border-emerald-500/40 text-xs font-mono font-medium flex items-center gap-2 transition-all duration-200 group cursor-pointer"
-              title="Review Sumeet's Verified Resume / CV"
-            >
-              <FileText className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
-              <span>Review CV</span>
-              <span className="text-[10px] text-emerald-400 font-mono bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
-                PDF
-              </span>
-              <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-            </button>
-
             {/* LinkedIn Button */}
             <a
               href={profile.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 py-2 rounded-xl bg-[#0077B5]/15 hover:bg-[#0077B5]/25 text-[#0077B5] hover:text-white border border-[#0077B5]/30 text-xs font-mono font-medium flex items-center gap-2 transition-all duration-200 group"
+              className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/15 text-zinc-300 hover:text-white border border-white/8 hover:border-[#adc6ff]/30 text-xs font-mono font-medium flex items-center gap-2 transition-all duration-200 hover:shadow-[0_0_15px_rgba(173,198,255,0.3)] group"
               title="Visit Sumeet's LinkedIn Profile"
             >
               <svg className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
@@ -150,11 +144,11 @@ export default function ProfileHero() {
               href={profile.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/15 text-zinc-300 hover:text-white border border-white/10 text-xs font-mono font-medium flex items-center gap-2 transition-all duration-200 group"
+              className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/15 text-zinc-300 hover:text-white border border-white/8 hover:border-[#adc6ff]/30 text-xs font-mono font-medium flex items-center gap-2 transition-all duration-200 hover:shadow-[0_0_15px_rgba(173,198,255,0.3)] group"
               title="Visit Sumeet's GitHub Profile"
             >
               <svg className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                <path d="M12 0C5.37 0 0 5.37 0 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
               </svg>
               <span>GitHub</span>
               <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />

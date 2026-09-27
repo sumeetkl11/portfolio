@@ -5,7 +5,7 @@ import { projects, type Project } from "@/lib/data";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import CinematicDialog from "@/components/ui/CinematicDialog";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Layers, ArrowUpRight } from "lucide-react";
 
 function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
@@ -19,7 +19,7 @@ export default function ProjectsSlider() {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const sliderTrackRef = useRef<HTMLDivElement>(null);
-  
+
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   useEffect(() => {
@@ -45,31 +45,21 @@ export default function ProjectsSlider() {
     const slider = sliderTrackRef.current;
     const section = sectionRef.current;
     if (section && slider) {
-      // Calculate exact translation needed so the 4th (last) project card lands dead-center in the viewport
       const getScrollAmount = () => {
         if (!slider) return 0;
         const cards = slider.querySelectorAll<HTMLElement>(".project-card");
         const lastCard = cards[cards.length - 1];
         if (!lastCard) return -(slider.scrollWidth - window.innerWidth);
 
-        // Center of the last card relative to the slider track
         const cardCenterInTrack = lastCard.offsetLeft + lastCard.offsetWidth / 2;
-        // Target translation to align cardCenterInTrack with the horizontal center of the viewport
         const targetX = window.innerWidth / 2 - cardCenterInTrack;
         return Math.min(0, targetX);
       };
 
       const ctx = gsap.context(() => {
-        // Calculate actual horizontal distance needed
         const horizontalDistance = Math.abs(getScrollAmount());
-
-        // Convert horizontal distance to scroll duration
-        // Use a scaling factor: 1px of horizontal = 2px of vertical scroll
         const scrollDistanceForAnimation = horizontalDistance * 2;
-
-        // Add hold time: shorter gap to Skills section
         const holdDistance = window.innerHeight * 0.6;
-
         const totalScrollDistance = scrollDistanceForAnimation + holdDistance;
 
         const tl = gsap.timeline({
@@ -82,25 +72,21 @@ export default function ProjectsSlider() {
             scrub: 1,
             anticipatePin: 1,
             invalidateOnRefresh: true,
-          }
+          },
         });
 
-        // Calculate proportional durations for timeline phases
         const animationPhase = scrollDistanceForAnimation / totalScrollDistance;
         const holdPhase = holdDistance / totalScrollDistance;
 
-        // Phase 1: Smoothly slide all cards until Card 4 is centered
         tl.to(slider, {
           x: () => getScrollAmount(),
           ease: "none",
           duration: animationPhase,
-        })
-        // Phase 2: Rest hold — Card 4 stays centered while user scrolls
-        .to({}, {
+        }).to({}, {
           duration: holdPhase,
         });
       }, sectionRef);
-      
+
       document.fonts.ready.then(() => {
         ScrollTrigger.refresh();
       });
@@ -119,53 +105,82 @@ export default function ProjectsSlider() {
 
   return (
     <>
-      <section ref={sectionRef} id="projects" className="h-screen w-full relative bg-black overflow-hidden flex flex-col justify-center z-10">
+      <section
+        ref={sectionRef}
+        id="projects"
+        className="h-screen w-full relative bg-[#0a0a0b] overflow-hidden flex flex-col justify-center z-10 border-t border-white/5"
+      >
         {/* Subtle grid background */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
-        <div className="w-full px-6 md:px-12 relative z-10 mb-6 md:mb-8">
-          <h2 ref={titleRef} className="text-4xl md:text-5xl lg:text-7xl font-display font-bold uppercase tracking-wider">
-            Projects
-          </h2>
+        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 relative z-10 mb-6 md:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-[#adc6ff] animate-pulse" />
+              <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#adc6ff] font-semibold">
+                FEATURED ARCHITECTURES
+              </span>
+            </div>
+            <h2
+              ref={titleRef}
+              className="text-4xl md:text-5xl lg:text-7xl font-display font-bold uppercase tracking-wider text-white"
+            >
+              Projects
+            </h2>
+          </div>
+          <span className="text-xs font-mono text-zinc-400 hidden md:block">
+
+          </span>
         </div>
 
         <div className="relative z-10 w-full overflow-visible">
-          <div 
-            ref={sliderTrackRef} 
+          <div
+            ref={sliderTrackRef}
             className="flex gap-8 px-6 md:px-12 w-max items-stretch"
           >
             {projects.map((project, i) => (
               <div
                 key={project.id}
+                role="button"
+                tabIndex={0}
+                aria-label={`Inspect ${project.title} architecture`}
                 onClick={() => setSelectedProject(project)}
-                className="project-card group relative w-[85vw] sm:w-[60vw] md:w-[45vw] lg:w-[35vw] h-[55vh] min-h-[460px] max-h-[580px] rounded-3xl overflow-hidden cursor-none glass-panel border border-white/5 transition-colors duration-500 hover:border-white/20 bg-zinc-900/50 flex flex-col justify-between p-6 md:p-8 flex-shrink-0"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelectedProject(project);
+                  }
+                }}
+                className="project-card group relative w-[85vw] sm:w-[60vw] md:w-[45vw] lg:w-[35vw] h-[55vh] min-h-[460px] max-h-[580px] rounded-3xl overflow-hidden cursor-pointer dark-glass-card border border-white/10 hover:border-[#adc6ff]/50 transition-all duration-500 bg-zinc-950/70 flex flex-col justify-between p-6 md:p-8 flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#adc6ff] hover:shadow-[0_0_40px_rgba(173,198,255,0.15)]"
               >
-                {/* Background image could go here, for now it's a gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-                
-                {/* Project Number */}
+                {/* Background Ambient Radial Glow */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#adc6ff]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+                {/* Project Sequence Number */}
                 <div className="text-6xl md:text-8xl font-display font-bold text-white/5 group-hover:text-white/10 transition-colors duration-500 absolute top-4 right-8 pointer-events-none">
-                  {(i + 1).toString().padStart(2, '0')}
+                  {(i + 1).toString().padStart(2, "0")}
                 </div>
 
                 <div className="relative z-10">
-                  <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest block mb-3">
+                  <span className="text-[11px] font-mono text-[#adc6ff] uppercase tracking-widest block mb-3 font-medium">
                     {project.category}
                   </span>
-                  <h3 className="text-2xl md:text-3xl font-bold tracking-tight mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-zinc-500 transition-all duration-500">
+                  <h3 className="text-2xl md:text-3xl font-bold tracking-tight mb-3 text-white group-hover:text-[#adc6ff] transition-colors duration-300">
                     {project.title}
                   </h3>
 
-                  <p className="text-zinc-400 text-xs md:text-sm line-clamp-3 mb-4 transition-colors duration-500 group-hover:text-zinc-300">
+                  <p className="text-zinc-400 text-xs md:text-sm line-clamp-3 mb-4 leading-relaxed transition-colors duration-300 group-hover:text-zinc-300">
                     {project.description}
                   </p>
 
                   {project.metrics && (
-                    <div className="grid grid-cols-2 gap-2 mb-4 p-2.5 rounded-lg bg-white/[0.03] border border-white/5 font-mono">
+                    <div className="grid grid-cols-2 gap-2 mb-4 p-3 rounded-xl bg-white/[0.03] border border-white/5 font-mono">
                       {project.metrics.map((metric, idx) => (
                         <div key={idx} className="flex flex-col">
-                          <span className="text-[10px] text-zinc-500 uppercase tracking-wider">{metric.label}:</span>
-                          <span className="text-xs text-zinc-300 font-semibold group-hover:text-white transition-colors duration-500">{metric.value}</span>
+                          <span className="text-[10px] text-zinc-400 uppercase tracking-wider">{metric.label}:</span>
+                          <span className="text-xs text-zinc-200 font-semibold group-hover:text-white transition-colors">
+                            {metric.value}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -175,42 +190,54 @@ export default function ProjectsSlider() {
                 <div className="relative z-10 mt-auto pt-4 flex flex-col gap-3">
                   <div className="flex flex-wrap gap-2">
                     {project.techStack.slice(0, 4).map((tech) => (
-                      <span key={tech} className="text-[10px] uppercase font-mono tracking-wider px-2 py-1 rounded bg-white/5 text-zinc-400 border border-white/5">
+                      <span
+                        key={tech}
+                        className="text-[10px] uppercase font-mono tracking-wider px-2.5 py-1 rounded-md bg-white/5 text-zinc-300 border border-white/5 group-hover:border-[#adc6ff]/20 transition-colors"
+                      >
                         {tech}
                       </span>
                     ))}
                     {project.techStack.length > 4 && (
-                      <span className="text-[10px] uppercase font-mono tracking-wider px-2 py-1 rounded bg-white/5 text-zinc-400 border border-white/5">
+                      <span className="text-[10px] uppercase font-mono tracking-wider px-2.5 py-1 rounded-md bg-white/5 text-zinc-400 border border-white/5">
                         +{project.techStack.length - 4}
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-6 pt-3 border-t border-white/10 mt-1">
-                    {project.repoUrl && (
-                      <a
-                        href={project.repoUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex items-center gap-2 text-sm font-mono text-zinc-400 hover:text-white transition-colors cursor-pointer relative z-20"
-                      >
-                        <GithubIcon className="w-4 h-4" />
-                        Code
-                      </a>
-                    )}
-                    {project.liveUrl && (
-                      <a
-                        href={project.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex items-center gap-2 text-sm font-mono text-zinc-400 hover:text-white transition-colors cursor-pointer relative z-20"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        Live Site
-                      </a>
-                    )}
+                  <div className="flex items-center justify-between pt-3 border-t border-white/10 mt-1">
+                    <div className="flex items-center gap-4">
+                      {project.repoUrl && (
+                        <a
+                          href={project.repoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-white transition-colors cursor-pointer relative z-20 py-1"
+                          title="View Source Code"
+                        >
+                          <GithubIcon className="w-3.5 h-3.5" />
+                          <span>Code</span>
+                        </a>
+                      )}
+                      {project.liveUrl && (
+                        <a
+                          href={project.liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-white transition-colors cursor-pointer relative z-20 py-1"
+                          title="View Live Deployment"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>Live</span>
+                        </a>
+                      )}
+                    </div>
+
+                    <span className="text-[11px] font-mono text-[#adc6ff] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                      <span>TRD Details</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </span>
                   </div>
                 </div>
               </div>
@@ -222,10 +249,10 @@ export default function ProjectsSlider() {
       </section>
 
       {/* Cinematic Modal */}
-      <CinematicDialog 
-        project={selectedProject} 
-        isOpen={!!selectedProject} 
-        onClose={() => setSelectedProject(null)} 
+      <CinematicDialog
+        project={selectedProject}
+        isOpen={Boolean(selectedProject)}
+        onClose={() => setSelectedProject(null)}
       />
     </>
   );

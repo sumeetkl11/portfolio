@@ -28,6 +28,19 @@ export interface Education {
   description: string;
 }
 
+export interface Certification {
+  id: string;
+  title: string;
+  issuer: string;
+  issueDate: string;
+  category: string;
+  credentialId?: string;
+  verificationUrl?: string;
+  pdfUrl?: string;
+  badgeUrl?: string;
+  logoUrl?: string;
+}
+
 export interface Profile {
   name: string;
   tagline: string;

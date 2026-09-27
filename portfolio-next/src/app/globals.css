@@ -2,8 +2,9 @@
 
 @theme {
   --font-sans: var(--font-inter);
-  --font-display: var(--font-cinzel);
-  
+  --font-display: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+
   --animate-marquee: marquee 30s linear infinite;
 
   @keyframes marquee {
@@ -14,8 +15,14 @@
 
 @layer base {
   :root {
-    --background: #000000;
+    --background: #0a0a0b;
     --foreground: #ffffff;
+    --text-primary: #ffffff;
+    --text-secondary: #d4d4d8;
+    --text-tertiary: #a1a1aa;
+    --border: rgba(255, 255, 255, 0.08);
+    --accent-primary: #adc6ff;
+    --accent-secondary: #d0bcff;
   }
 
   body {
@@ -28,9 +35,24 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Hide system cursor for custom cursor (without !important to allow user overrides) */
-  html, body, *, *::before, *::after {
-    cursor: none;
+  /* Hide cursor on most interactive elements for custom cursor */
+  a:not(input):not(textarea):not(select),
+  button:not(input):not(textarea):not(select),
+  [role="button"]:not(input):not(textarea):not(select) {
+    cursor: none !important;
+  }
+
+  /* Show system cursor ONLY on form inputs where typing occurs */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  textarea,
+  select,
+  [contenteditable="true"] {
+    cursor: text !important;
   }
 
   /* Restore cursor for users who prefer reduced motion */
@@ -99,8 +121,37 @@
       inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
   }
 
+  .dark-glass-card {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+    backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 8px 32px 0 rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.03);
+  }
+
+  .dark-glass-card:hover {
+    border-color: rgba(173, 198, 255, 0.3);
+    box-shadow:
+      0 12px 40px 0 rgba(0, 0, 0, 0.5),
+      0 0 20px 0 rgba(173, 198, 255, 0.1),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  }
+
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50;
+  }
+
+  .glow-blue {
+    box-shadow: 0 0 25px rgba(173, 198, 255, 0.35);
+  }
+
+  .glow-violet {
+    box-shadow: 0 0 25px rgba(208, 188, 255, 0.35);
   }
 }
 

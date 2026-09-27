@@ -16,7 +16,7 @@ export default function Footer() {
           <span className="text-2xl font-display font-bold uppercase tracking-widest">
             {profile.name.split(" ")[0]}
           </span>
-          <p className="text-sm text-zinc-500 mt-2">
+          <p className="text-sm text-zinc-400 mt-2">
             © {new Date().getFullYear()} All rights reserved.
           </p>
         </div>
