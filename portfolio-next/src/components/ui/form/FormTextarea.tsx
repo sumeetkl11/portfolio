@@ -38,7 +38,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
 
     // Merge refs
     const mergedRef = (node: HTMLTextAreaElement) => {
-      (autoResizeRef as any).current = node;
+      (autoResizeRef as React.MutableRefObject<HTMLTextAreaElement | null>).current = node;
       if (typeof ref === "function") {
         ref(node);
       } else if (ref) {
