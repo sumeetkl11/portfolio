@@ -3,7 +3,6 @@ import { contactFormSchema } from "@/lib/formValidation";
 
 // Rate limiting configuration
 const RATE_LIMIT_WINDOW = 60_000; // 60 seconds
-const RATE_LIMIT_MAX_REQUESTS = 1;
 
 // Fallback in-memory store (only used if KV is unavailable)
 const rateLimitMap = new Map<string, number>();
@@ -118,7 +117,7 @@ export async function POST(req: Request) {
       const { Resend } = await import("resend");
       const resend = new Resend(process.env.RESEND_API_KEY);
 
-      const { data, error } = await resend.emails.send({
+      const { error } = await resend.emails.send({
         from: "Portfolio <onboarding@resend.dev>",
         to: process.env.CONTACT_EMAIL,
         replyTo: email,
