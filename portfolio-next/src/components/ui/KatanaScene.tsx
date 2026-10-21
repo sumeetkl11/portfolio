@@ -2,8 +2,8 @@
 
 import { useRef, useState, useEffect, useCallback, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment } from "@react-three/drei";
 import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import KatanaModel from "./KatanaModel";
 import { Skill } from "@/types";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -14,7 +14,7 @@ interface KatanaSceneProps {
   onActiveChange: (index: number) => void;
 }
 
-// ── 3D Finite Coverflow Controller ──
+// 3D Finite Coverflow Controller
 function CoverflowController({
   skills,
   targetOffset,
@@ -36,13 +36,11 @@ function CoverflowController({
   const [currentOffset, setCurrentOffset] = useState(targetOffset);
 
   useFrame((_state, delta) => {
-    // Responsive frame-rate independent inertia interpolation
     const lerpFactor = 1 - Math.exp(-9 * delta);
     const prev = currentOffsetRef.current;
     const next = THREE.MathUtils.lerp(prev, targetOffset, lerpFactor);
 
     currentOffsetRef.current = next;
-    // Re-render slot positions when moving
     if (Math.abs(next - prev) > 0.0001) {
       setCurrentOffset(next);
     }
@@ -51,26 +49,16 @@ function CoverflowController({
   return (
     <>
       {skills.map((skill, index) => {
-        // Finite non-wrapping delta (strictly clamped 0 to skills.length - 1)
         const delta = index - currentOffset;
         const absDelta = Math.abs(delta);
 
-        // Render katanas within the 5-item visible window (|delta| <= 2.5)
         const isVisible = absDelta <= 2.5;
         if (!isVisible) return null;
 
-        // ── 3D Compact Coverflow Math (Strictly fits inside card container) ──
-        // Center: delta = 0 -> X = 0, Z = 0, Scale = 2.4 (clean, elegant & proportional)
-        // Immediate Sides: delta = ±1 -> X = ±1.45, Z = -1.40, Scale = 1.92 (80%)
-        // Far Sides: delta = ±2 -> X = ±2.85, Z = -2.80, Scale = 1.44 (60%)
         const x = Math.sign(delta) * Math.pow(absDelta, 0.95) * 1.45;
-        const z = -absDelta * 1.40;
-        // Positioned in the lower portion of the card so the header above has ample breathing room
+        const z = -absDelta * 1.4;
         const y = -0.62 - 0.08 * absDelta;
-        // Scaled down model size to fit comfortably within the card height
-        const scale = 2.4 * Math.max(0.55, 1.0 - 0.20 * absDelta);
-
-        // Only the active selected Katana is centered and drawn
+        const scale = 2.4 * Math.max(0.55, 1.0 - 0.2 * absDelta);
         const isCenter = index === activeIndex;
 
         return (
@@ -98,34 +86,12 @@ export default function KatanaScene({
   activeIndex,
   onActiveChange,
 }: KatanaSceneProps) {
-  const [targetOffset, setTargetOffset] = useState(activeIndex);
+  const [dragOffset, setDragOffset] = useState<number | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isBoxVisibleRef = useRef(false);
 
-  // Synchronize targetOffset when parent activeIndex changes
-  useEffect(() => {
-    setTargetOffset(activeIndex);
-  }, [activeIndex]);
+  const targetOffset = dragOffset ?? activeIndex;
 
-  // Track card container visibility with IntersectionObserver
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // Box is active when at least 60% is visible in viewport
-        isBoxVisibleRef.current = entry.isIntersecting && entry.intersectionRatio >= 0.60;
-      },
-      { threshold: [0, 0.25, 0.5, 0.60, 0.75, 0.9, 1.0] }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  // Wheel & drag interaction states
   const lastWheelTimeRef = useRef(0);
   const isDraggingRef = useRef(false);
   const dragStartXRef = useRef(0);
@@ -133,53 +99,44 @@ export default function KatanaScene({
 
   const N = skills.length;
 
-  // ── Visibility-Based Wheel Event Handler (Locks scroll ONLY when box is in view, releases at ends) ──
   const handleWheel = useCallback(
     (e: WheelEvent) => {
       const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
       if (Math.abs(delta) < 12) return;
 
-      // 1. DO NOT intercept scroll if card is not substantially visible in viewport!
       const el = containerRef.current;
       if (el) {
         const rect = el.getBoundingClientRect();
-        const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+        const visibleHeight =
+          Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
         const ratio = visibleHeight / rect.height;
-        if (ratio < 0.60) {
-          return; // Let user scroll freely into or past the section
+        if (ratio < 0.6) {
+          return;
         }
       }
 
-      const dir = Math.sign(delta); // > 0 scrolling down, < 0 scrolling up
+      const dir = Math.sign(delta);
       const now = performance.now();
 
       if (dir > 0) {
-        // User scrolling DOWN
         if (targetOffset < N - 1) {
-          // Box in view & not at final katana: LOCK scroll and advance katana!
           e.preventDefault();
           if (now - lastWheelTimeRef.current > 200) {
             lastWheelTimeRef.current = now;
             const next = Math.min(N - 1, Math.round(targetOffset + 1));
-            setTargetOffset(next);
+            setDragOffset(null);
             onActiveChange(next);
           }
-        } else {
-          // At final katana (Git & GitHub): RELEASE scroll! Allow natural page scroll down
         }
       } else if (dir < 0) {
-        // User scrolling UP
         if (targetOffset > 0) {
-          // Box in view & not at first katana: LOCK scroll and retreat katana!
           e.preventDefault();
           if (now - lastWheelTimeRef.current > 200) {
             lastWheelTimeRef.current = now;
             const prev = Math.max(0, Math.round(targetOffset - 1));
-            setTargetOffset(prev);
+            setDragOffset(null);
             onActiveChange(prev);
           }
-        } else {
-          // At first katana (TypeScript): RELEASE scroll! Allow natural page scroll up
         }
       }
     },
@@ -190,14 +147,12 @@ export default function KatanaScene({
     const el = containerRef.current;
     if (!el) return;
 
-    // Non-passive wheel listener allows conditional e.preventDefault()
     el.addEventListener("wheel", handleWheel, { passive: false });
     return () => {
       el.removeEventListener("wheel", handleWheel);
     };
   }, [handleWheel]);
 
-  // ── Drag / Swipe Interaction Handlers ──
   const handlePointerDown = (e: React.PointerEvent) => {
     isDraggingRef.current = true;
     dragStartXRef.current = e.clientX;
@@ -207,24 +162,23 @@ export default function KatanaScene({
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!isDraggingRef.current) return;
     const diff = dragStartXRef.current - e.clientX;
-    const offsetDelta = diff / 160; // Drag sensitivity
+    const offsetDelta = diff / 160;
     const clamped = Math.max(0, Math.min(N - 1, dragStartOffsetRef.current + offsetDelta));
-    setTargetOffset(clamped);
+    setDragOffset(clamped);
   };
 
   const handlePointerUp = () => {
     if (isDraggingRef.current) {
       isDraggingRef.current = false;
       const snapped = Math.max(0, Math.min(N - 1, Math.round(targetOffset)));
-      setTargetOffset(snapped);
+      setDragOffset(null);
       onActiveChange(snapped);
     }
   };
 
-  // Direct click on katana or pagination pill
   const handleKatanaClick = (clickedIndex: number) => {
     const clamped = Math.max(0, Math.min(N - 1, clickedIndex));
-    setTargetOffset(clamped);
+    setDragOffset(null);
     onActiveChange(clamped);
   };
 
@@ -238,7 +192,6 @@ export default function KatanaScene({
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
     >
-      {/* ── High-Res Anti-Aliased 3D Canvas (Cleanly framed inside card) ── */}
       <Canvas
         camera={{ position: [0, 0.05, 7.6], fov: 36 }}
         gl={{
@@ -246,39 +199,26 @@ export default function KatanaScene({
           alpha: true,
           powerPreference: "high-performance",
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.25,
+          toneMappingExposure: 1.2,
         }}
         dpr={[1, Math.min(typeof window !== "undefined" ? window.devicePixelRatio : 2, 2)]}
-        onCreated={({ gl }) => {
+        onCreated={({ gl, scene }) => {
           gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+          const pmremGenerator = new THREE.PMREMGenerator(gl);
+          pmremGenerator.compileEquirectangularShader();
+          const envRoom = new RoomEnvironment();
+          const envTarget = pmremGenerator.fromScene(envRoom, 0.04);
+          scene.environment = envTarget.texture;
+          pmremGenerator.dispose();
+          envRoom.dispose();
         }}
       >
         <Suspense fallback={null}>
-          {/* ── Cinematic 3-Point Studio Lighting ── */}
-          <ambientLight intensity={0.48} color="#d0c8f0" />
+          <ambientLight intensity={0.45} color="#e4e4e7" />
+          <directionalLight position={[6, 12, 8]} intensity={3.2} color="#ffffff" castShadow />
+          <directionalLight position={[-7, 8, -4]} intensity={2.0} color="#a1a1aa" />
+          <pointLight position={[0, -3, 4]} intensity={0.4} color="#52525b" />
 
-          {/* Key light catching the polished steel cutting edges */}
-          <directionalLight
-            position={[6, 12, 8]}
-            intensity={3.4}
-            color="#fffcf5"
-            castShadow
-          />
-
-          {/* Cool rim light for metal silhouette edge separation */}
-          <directionalLight
-            position={[-7, 8, -4]}
-            intensity={2.2}
-            color="#82a5e8"
-          />
-
-          {/* Under-bounce point light */}
-          <pointLight position={[0, -3, 4]} intensity={0.5} color="#2a1840" />
-
-          {/* HDR environment reflections for urushi lacquer and steel luster */}
-          <Environment preset="night" />
-
-          {/* ── 3D Finite Coverflow Controller ── */}
           <CoverflowController
             skills={skills}
             targetOffset={targetOffset}
@@ -291,8 +231,8 @@ export default function KatanaScene({
         </Suspense>
       </Canvas>
 
-      {/* ── Carousel Navigation Controls (Sleek Dark Glass) ── */}
-      <div className="absolute inset-x-4 md:inset-x-8 top-[58%] -translate-y-1/2 flex justify-between pointer-events-none z-30">
+      {/* Carousel Navigation Controls (Zero backdrop-filter over WebGL) */}
+      <div className="absolute inset-x-4 md:inset-x-8 top-[56%] -translate-y-1/2 flex justify-between pointer-events-none z-30">
         <button
           type="button"
           disabled={activeIndex === 0}
@@ -304,8 +244,9 @@ export default function KatanaScene({
               handleKatanaClick(activeIndex - 1);
             }
           }}
-          className={`pointer-events-auto w-11 h-11 md:w-13 md:h-13 rounded-full border border-white/10 bg-black/40 backdrop-blur-md flex items-center justify-center text-white/70 hover:text-white hover:border-white/30 hover:bg-white/5 transition-all duration-200 ${activeIndex === 0 ? "opacity-30 cursor-not-allowed" : "cursor-pointer"
-            }`}
+          className={`pointer-events-auto w-11 h-11 rounded-lg border border-white/15 bg-[#0a0a0a]/90 flex items-center justify-center text-white/75 hover:text-white hover:border-white/40 transition-colors duration-200 ${
+            activeIndex === 0 ? "opacity-30 cursor-not-allowed" : "cursor-pointer"
+          }`}
           aria-label="Previous Mastery"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -322,16 +263,17 @@ export default function KatanaScene({
               handleKatanaClick(activeIndex + 1);
             }
           }}
-          className={`pointer-events-auto w-11 h-11 md:w-13 md:h-13 rounded-full border border-white/10 bg-black/40 backdrop-blur-md flex items-center justify-center text-white/70 hover:text-white hover:border-white/30 hover:bg-white/5 transition-all duration-200 ${activeIndex === N - 1 ? "opacity-30 cursor-not-allowed" : "cursor-pointer"
-            }`}
+          className={`pointer-events-auto w-11 h-11 rounded-lg border border-white/15 bg-[#0a0a0a]/90 flex items-center justify-center text-white/75 hover:text-white hover:border-white/40 transition-colors duration-200 ${
+            activeIndex === N - 1 ? "opacity-30 cursor-not-allowed" : "cursor-pointer"
+          }`}
           aria-label="Next Mastery"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
 
-      {/* ── Carousel Pagination Indicators (Optimized for 10 Skills) ── */}
-      <div className="absolute bottom-7 inset-x-0 flex justify-center items-center gap-1.5 md:gap-2 pointer-events-auto z-30">
+      {/* Bottom Interactive Dock Indicators */}
+      <div className="absolute bottom-6 inset-x-0 flex justify-center items-center gap-1.5 md:gap-2 pointer-events-auto z-30">
         {skills.map((skill, index) => {
           const isActive = activeIndex === index;
           return (
@@ -344,15 +286,15 @@ export default function KatanaScene({
                 e.currentTarget.blur();
                 handleKatanaClick(index);
               }}
-              className="group py-2 px-0.5 md:px-1 focus:outline-none cursor-pointer"
+              className="group py-2 px-1 focus:outline-none cursor-pointer"
               aria-label={`Select ${skill.name}`}
             >
               <div
-                className={`h-1.5 rounded-full transition-all duration-300 ${isActive
-                    ? "w-6 md:w-8 shadow-[0_0_10px_rgba(255,255,255,0.8)]"
-                    : "w-2 md:w-2.5 bg-white/20 group-hover:bg-white/40"
-                  }`}
-                style={isActive ? { backgroundColor: skill.color, boxShadow: `0 0 12px ${skill.color}` } : undefined}
+                className={`h-1 rounded-full transition-all duration-200 ${
+                  isActive
+                    ? "w-7 bg-white"
+                    : "w-2 bg-white/25 group-hover:bg-white/50"
+                }`}
               />
             </button>
           );
