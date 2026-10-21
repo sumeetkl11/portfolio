@@ -13,8 +13,10 @@ This project is built as a unified Next.js 16 application with hardware-accelera
 - **3D Graphics**: Three.js & `@react-three/fiber` for real-time 3D model interaction
 - **Smooth Inertia Motion**: Lenis + GSAP ScrollTrigger for buttery 60fps pacing
 - **Design System**: "The Digital Nexus" — Dark mode glassmorphism (`#000000` pitch black void) styled with Tailwind CSS 4
+- **Ready-web-v2 Release**: Full keyboard navigation (Ctrl+K Command Palette), Telemetry HUD, Upstash Redis rate limiting, and Resend email validation.
 
 ---
+
 
 ## 📁 Repository Structure
 
