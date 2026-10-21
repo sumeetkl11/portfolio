@@ -1,34 +1,29 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-inter);
-  --font-display: var(--font-inter);
-  --font-mono: var(--font-jetbrains-mono);
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
 
-  --animate-marquee: marquee 30s linear infinite;
-  --animate-spin-slow: spin-slow 8s linear infinite;
+  --animate-marquee: marquee 32s linear infinite;
 
   @keyframes marquee {
-    0% { transform: translateX(0%); }
-    100% { transform: translateX(-50%); }
-  }
-
-  @keyframes spin-slow {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% { transform: translate3d(0%, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
   }
 }
 
 @layer base {
   :root {
-    --background: #0a0a0b;
+    --background: #000000;
+    --surface: #0a0a0a;
     --foreground: #ffffff;
     --text-primary: #ffffff;
     --text-secondary: #d4d4d8;
     --text-tertiary: #a1a1aa;
     --border: rgba(255, 255, 255, 0.08);
-    --accent-primary: #adc6ff;
-    --accent-secondary: #d0bcff;
+    --accent-primary: #ffffff;
+    --accent-secondary: #a1a1aa;
   }
 
   body {
@@ -39,12 +34,13 @@
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    letter-spacing: 0.005em;
   }
 
-  /* Hide cursor on most interactive elements for custom cursor */
-  a:not(input):not(textarea):not(select),
-  button:not(input):not(textarea):not(select),
-  [role="button"]:not(input):not(textarea):not(select) {
+  /* Hide native cursor on interactive elements only when custom cursor is active */
+  html.has-custom-cursor a:not(input):not(textarea):not(select),
+  html.has-custom-cursor button:not(input):not(textarea):not(select),
+  html.has-custom-cursor [role="button"]:not(input):not(textarea):not(select) {
     cursor: none !important;
   }
 
@@ -76,28 +72,28 @@
 
   /* Restore focus-visible outlines for keyboard navigation (WCAG 2.4.7) */
   :focus-visible {
-    outline: 2px solid rgba(255, 255, 255, 0.6);
+    outline: 2px solid rgba(255, 255, 255, 0.85);
     outline-offset: 3px;
   }
 
   /* Ultra-sleek minimalist dark scrollbars */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
   ::-webkit-scrollbar-track {
-    background: transparent;
+    background: #000000;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.18);
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.4);
   }
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+    scrollbar-color: rgba(255, 255, 255, 0.18) #000000;
   }
 
   /* Lenis recommended CSS */
@@ -128,56 +124,32 @@
   }
 }
 
-/* Utilities for noise or glass */
 @layer utilities {
   .glass-panel {
-    @apply bg-black/40 backdrop-blur-md border border-white/10;
+    @apply bg-[#0a0a0a]/85 backdrop-blur-md border border-white/10;
   }
 
   .enhanced-glass {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.08) 0%,
-      rgba(255, 255, 255, 0.03) 100%
-    );
-    backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow:
-      0 8px 32px 0 rgba(0, 0, 0, 0.37),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+    background: #0a0a0a;
+    border: 1px solid rgba(255, 255, 255, 0.12);
   }
 
   .dark-glass-card {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.05) 0%,
-      rgba(255, 255, 255, 0.02) 100%
-    );
-    backdrop-filter: blur(16px) saturate(180%);
+    background: #0a0a0a;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow:
-      0 8px 32px 0 rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.03);
+    transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .dark-glass-card:hover {
-    border-color: rgba(173, 198, 255, 0.3);
-    box-shadow:
-      0 12px 40px 0 rgba(0, 0, 0, 0.5),
-      0 0 20px 0 rgba(173, 198, 255, 0.1),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.24);
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50;
+    @apply bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60;
   }
 
-  .glow-blue {
-    box-shadow: 0 0 25px rgba(173, 198, 255, 0.35);
-  }
-
-  .glow-violet {
-    box-shadow: 0 0 25px rgba(208, 188, 255, 0.35);
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
 }
 
