@@ -5,8 +5,13 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import CertificateCard from "@/components/ui/CertificateCard";
 import CertificateModal from "@/components/ui/CertificateModal";
+import KineticHeading from "@/components/ui/KineticHeading";
 import { certifications } from "@/lib/certifications";
 import { Certification } from "@/types";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export default function Certifications() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -14,22 +19,23 @@ export default function Certifications() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
         ".cert-card",
-        { opacity: 0, y: 40, scale: 0.95 },
+        { opacity: 0, y: 28 },
         {
           opacity: 1,
           y: 0,
-          scale: 1,
-          duration: 0.7,
+          duration: 0.65,
           stagger: 0.1,
-          ease: "cubic-bezier(0.16, 1, 0.3, 1)",
+          ease: "power3.out",
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top 78%",
+            once: true,
           },
         }
       );
@@ -52,24 +58,22 @@ export default function Certifications() {
     <section
       ref={sectionRef}
       id="certifications"
-      className="relative w-full py-30 md:py-40 bg-[#0a0a0b] text-white border-t border-white/5 overflow-hidden"
+      className="relative w-full py-28 md:py-36 bg-black text-white border-t border-white/10 overflow-hidden"
     >
-      <div className="max-w-7xl xl:max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-20 relative z-10">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 relative z-10">
         {/* Section Header */}
         <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-2 h-2 rounded-full bg-[#adc6ff] animate-pulse" />
-              <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#adc6ff] font-semibold">
-                VERIFIED CREDENTIALS
-              </span>
-            </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-display font-bold uppercase tracking-tight">
-              Certifications & Badges
-            </h2>
+            <span className="text-xs font-mono uppercase tracking-widest text-white/50 block mb-2.5">
+              04 · VERIFIED CREDENTIALS
+            </span>
+            <KineticHeading
+              text="Certifications & Badges"
+              className="text-4xl sm:text-5xl md:text-6xl font-display font-extrabold tracking-tight text-white"
+            />
           </div>
-          <span className="text-sm font-mono text-zinc-400">
-            CONTINUOUS SPECIALIZATION
+          <span className="text-xs font-mono text-white/50">
+            GOOGLE · COURSERA · CREDLY VERIFIED
           </span>
         </div>
 
@@ -86,7 +90,6 @@ export default function Certifications() {
         </div>
       </div>
 
-      {/* Certificate Modal */}
       <CertificateModal
         certification={selectedCertification}
         isOpen={isModalOpen}
