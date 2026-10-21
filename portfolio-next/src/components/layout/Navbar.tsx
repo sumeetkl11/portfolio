@@ -1,55 +1,71 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { profile } from "@/lib/data";
 import clsx from "clsx";
 import { useLenis } from "@/components/layout/SmoothScroll";
 import { useResumeModal } from "@/context/ResumeModalContext";
-import { FileText, Menu, X, ArrowUpRight } from "lucide-react";
+import Magnetic from "@/components/ui/Magnetic";
+import { Menu, X, ArrowUpRight, Command } from "lucide-react";
+
+const NAV_LINKS = [
+  { name: "About", href: "#about" },
+  { name: "Work", href: "#projects" },
+  { name: "Skills", href: "#skills" },
+  { name: "Experience", href: "#experience" },
+  { name: "Contact", href: "#contact" },
+];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("");
   const lenis = useLenis();
-  const { openResumeModal } = useResumeModal();
-  const navRef = useRef<HTMLDivElement>(null);
+  const { openResumeModal, openCommandPalette } = useResumeModal();
 
-  const navLinks = [
-    { name: "Home", href: "#profile" },
-    { name: "Projects", href: "#projects" },
-    { name: "Skills", href: "#skills" },
-    { name: "Experience", href: "#experience" },
-    { name: "Contact", href: "#contact" },
-  ];
-
-  // Handle scroll effects & active section tracking
   useEffect(() => {
     const handleScroll = () => {
       const currentScroll = window.scrollY;
-      setScrolled(currentScroll > 50);
+      setScrolled(currentScroll > 40);
 
-      // Active section detection
-      const sections = navLinks.map((link) => link.href.replace("#", ""));
-      for (const section of sections) {
-        const element = document.getElementById(section);
+      if (currentScroll < window.innerHeight * 0.5) {
+        setActiveSection("");
+        return;
+      }
+
+      const sectionIds = ["about", "projects", "skills", "certifications", "experience", "contact"];
+      for (const id of sectionIds) {
+        const element = document.getElementById(id);
         if (element) {
           const rect = element.getBoundingClientRect();
-          if (rect.top <= window.innerHeight * 0.3 && rect.bottom > window.innerHeight * 0.3) {
-            setActiveSection(section);
+          if (rect.top <= window.innerHeight * 0.35 && rect.bottom > window.innerHeight * 0.25) {
+            setActiveSection(id === "certifications" ? "experience" : id);
             break;
           }
         }
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     setMobileMenuOpen(false);
+    if (href === "#top") {
+      if (lenis) {
+        lenis.scrollTo(0, {
+          duration: 1.2,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      return;
+    }
+
     const targetId = href.replace("#", "");
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -67,33 +83,88 @@ export default function Navbar() {
   return (
     <header
       className={clsx(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
-        scrolled ? "py-3" : "py-5"
+        "fixed top-0 left-0 right-0 z-50 transition-colors duration-300",
+        scrolled
+          ? "bg-black/65 backdrop-blur-md border-b border-white/10"
+          : "bg-transparent border-b border-transparent"
       )}
     >
-      <div className="max-w-[1600px] mx-auto px-6 lg:px-12 xl:px-16">
-        <nav
-          ref={navRef}
-          className={clsx(
-            "flex items-center justify-between rounded-full transition-all duration-500",
-            scrolled
-              ? "dark-glass-card border-white/10 py-3 px-4 md:px-6"
-              : "bg-transparent px-4 md:px-6"
-          )}
+      <div className="max-w-[1440px] mx-auto px-6 lg:px-12 h-16 flex items-center justify-between gap-8">
+        {/* Zone 1: Single Text Wordmark */}
+        <a
+          href="#top"
+          onClick={(e) => handleScrollTo(e, "#top")}
+          className="text-lg font-display font-extrabold tracking-tight text-white hover:text-zinc-300 transition-colors whitespace-nowrap shrink-0"
         >
-          {/* Brand Logo */}
-          <a
-            href="#profile"
-            onClick={(e) => handleScrollTo(e, "#profile")}
-            className="text-base font-display tracking-wider font-bold uppercase text-white hover:text-[#adc6ff] transition-colors whitespace-nowrap"
-          >
-            {profile.name.split(" ")[0]}
-            <span className="text-white/50">{profile.name.split(" ")[1]}</span>
-          </a>
+          SUMIT.
+        </a>
 
-          {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-2">
-            {navLinks.map((link) => {
+        {/* Zone 2: 5 Clean Single-Line Text Navigation Links */}
+        <nav aria-label="Primary Navigation" className="hidden md:flex items-center gap-8">
+          {NAV_LINKS.map((link) => {
+            const isActive = activeSection === link.href.replace("#", "");
+            return (
+              <a
+                key={link.name}
+                href={link.href}
+                onClick={(e) => handleScrollTo(e, link.href)}
+                className={clsx(
+                  "relative py-1 text-xs font-medium tracking-wide transition-colors duration-200 whitespace-nowrap shrink-0",
+                  isActive ? "text-white" : "text-white/60 hover:text-white"
+                )}
+              >
+                {link.name}
+                <span
+                  className={clsx(
+                    "absolute inset-x-0 -bottom-0.5 h-[1px] bg-white transition-transform duration-200 origin-left",
+                    isActive ? "scale-x-100" : "scale-x-0"
+                  )}
+                />
+              </a>
+            );
+          })}
+        </nav>
+
+        {/* Zone 3: Command Palette Shortcut + Magnetic Primary Action + Mobile Menu Trigger */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          <button
+            type="button"
+            onClick={openCommandPalette}
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0a0a0a] border border-white/15 hover:border-white/40 text-[11px] font-mono text-white/75 hover:text-white transition-colors cursor-pointer"
+            aria-label="Open Command Palette (Cmd+K)"
+            title="Open Command Palette (⌘K)"
+          >
+            <Command className="w-3 h-3 text-white/60" />
+            <span>K</span>
+          </button>
+
+          <Magnetic className="hidden md:inline-block">
+            <a
+              href="#contact"
+              onClick={(e) => handleScrollTo(e, "#contact")}
+              className="inline-flex items-center justify-center px-4 py-2 text-xs font-medium tracking-wide text-white bg-[#0a0a0a] border border-white/25 rounded-lg hover:bg-white hover:text-black hover:border-white transition-colors duration-200 whitespace-nowrap shrink-0"
+            >
+              Let&apos;s Talk
+            </a>
+          </Magnetic>
+
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="flex md:hidden w-11 h-11 rounded-lg bg-[#0a0a0a] border border-white/15 items-center justify-center text-white hover:border-white/40 transition-colors"
+            aria-label="Toggle Navigation Menu"
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Navigation Drawer */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-[#0a0a0a] border-b border-white/15 px-6 py-6 flex flex-col gap-5">
+          <nav aria-label="Mobile Navigation" className="flex flex-col divide-y divide-white/10">
+            {NAV_LINKS.map((link) => {
               const isActive = activeSection === link.href.replace("#", "");
               return (
                 <a
@@ -101,142 +172,71 @@ export default function Navbar() {
                   href={link.href}
                   onClick={(e) => handleScrollTo(e, link.href)}
                   className={clsx(
-                    "relative px-3 py-2 text-xs font-medium uppercase tracking-wider rounded-full transition-all duration-300",
-                    isActive
-                      ? "text-[#adc6ff]"
-                      : "text-zinc-400 hover:text-white hover:bg-white/5"
+                    "py-3.5 text-sm font-display font-bold tracking-tight transition-colors",
+                    isActive ? "text-white" : "text-white/60 hover:text-white"
                   )}
                 >
                   {link.name}
-                  {isActive && (
-                    <span className="absolute inset-x-2 bottom-2 h-[1px] bg-[#adc6ff]" />
-                  )}
                 </a>
               );
             })}
-          </div>
+          </nav>
 
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-3">
-            {/* LinkedIn */}
-            {/* <a
-              href={profile.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono font-medium rounded-full bg-white/10 hover:bg-white/15 text-white border border-white/8 hover:border-[#adc6ff]/30 transition-all hover:scale-105 hover:shadow-[0_0_15px_rgba(173,198,255,0.3)]"
-              title="Connect on LinkedIn"
+          <div className="flex flex-col gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                openCommandPalette();
+              }}
+              className="w-full py-3 px-4 rounded-lg bg-white/5 text-white text-xs font-mono border border-white/15 hover:border-white/40 transition-colors text-center whitespace-nowrap flex items-center justify-center gap-2"
             >
-              <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-              </svg>
-              <span>LinkedIn</span>
-            </a> */}
+              <Command className="w-3.5 h-3.5" />
+              <span>Command Palette &amp; TRD Inspector</span>
+            </button>
 
-            {/* Resume */}
-            {/* <button
-              onClick={openResumeModal}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono font-medium rounded-full bg-white/10 hover:bg-white/15 text-white border border-white/15 hover:border-[#adc6ff]/30 transition-all hover:scale-105"
-              title="Review CV"
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                openResumeModal();
+              }}
+              className="w-full py-3 px-4 rounded-lg bg-white/5 text-white text-xs font-mono border border-white/15 hover:border-white/40 transition-colors text-center whitespace-nowrap"
             >
-              <FileText className="w-3.5 h-3.5 text-zinc-300" />
-              <span>Resume</span>
-            </button> */}
+              Review Curriculum Vitae
+            </button>
 
-            {/* Contact CTA */}
+            <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+              <a
+                href={profile.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-2.5 px-3 rounded-lg bg-white/5 text-white/80 border border-white/10 flex items-center justify-center gap-1.5 hover:text-white hover:border-white/30 transition-colors whitespace-nowrap"
+              >
+                <span>LinkedIn</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </a>
+              <a
+                href={profile.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-2.5 px-3 rounded-lg bg-white/5 text-white/80 border border-white/10 flex items-center justify-center gap-1.5 hover:text-white hover:border-white/30 transition-colors whitespace-nowrap"
+              >
+                <span>GitHub</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </a>
+            </div>
+
             <a
               href="#contact"
               onClick={(e) => handleScrollTo(e, "#contact")}
-              className="inline-flex items-center justify-center px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider bg-[#adc6ff] text-black rounded-full hover:bg-[#8eb3ff] hover:shadow-lg hover:shadow-[#adc6ff]/30 hover:-translate-y-0.5 transition-all duration-300"
+              className="w-full py-3 px-4 rounded-lg bg-white text-black font-semibold text-center text-xs tracking-wide hover:bg-zinc-200 transition-colors whitespace-nowrap"
             >
-              Let's Talk
+              Let&apos;s Talk
             </a>
           </div>
-
-          {/* Mobile Menu Toggle */}
-          <div className="flex md:hidden items-center gap-2">
-            <button
-              onClick={openResumeModal}
-              className="px-3 py-1.5 text-[11px] font-mono rounded-full bg-white/10 text-white border border-white/10 flex items-center gap-1"
-            >
-              <FileText className="w-3 h-3" />
-              <span>CV</span>
-            </button>
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white border border-white/10 hover:bg-white/15 hover:border-[#adc6ff]/30 transition-all"
-              aria-label="Toggle Navigation Menu"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </nav>
-
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="md:hidden mt-3 rounded-2xl dark-glass-card p-6 border border-white/15 flex flex-col gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
-            <div className="flex flex-col gap-3">
-              {navLinks.map((link) => {
-                const isActive = activeSection === link.href.replace("#", "");
-                return (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    onClick={(e) => handleScrollTo(e, link.href)}
-                    className={clsx(
-                      "text-base font-medium py-3 border-b border-white/5 uppercase tracking-wider font-display",
-                      isActive ? "text-[#adc6ff]" : "text-zinc-300 hover:text-white"
-                    )}
-                  >
-                    {link.name}
-                  </a>
-                );
-              })}
-            </div>
-
-            <div className="pt-2 flex flex-col gap-3">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  openResumeModal();
-                }}
-                className="w-full py-3 rounded-xl bg-white/10 text-white font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-2 border border-white/15 hover:bg-white/20 hover:border-[#adc6ff]/30 transition-all"
-              >
-                <FileText className="w-4 h-4 text-emerald-400" />
-                <span>Review Full Resume (PDF)</span>
-              </button>
-
-              <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                <a
-                  href={profile.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-2.5 px-3 rounded-xl bg-[#0077B5]/20 text-[#0077B5] border border-[#0077B5]/30 flex items-center justify-center gap-1.5 hover:bg-[#0077B5]/30 hover:border-[#0077B5]/50 transition-all"
-                >
-                  <span>LinkedIn</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </a>
-                <a
-                  href={profile.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-2.5 px-3 rounded-xl bg-white/5 text-zinc-300 border border-white/10 flex items-center justify-center gap-1.5 hover:bg-white/10 hover:border-[#adc6ff]/30 transition-all"
-                >
-                  <span>GitHub</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </a>
-              </div>
-
-              <a
-                href="#contact"
-                onClick={(e) => handleScrollTo(e, "#contact")}
-                className="w-full py-3 rounded-xl bg-[#adc6ff] text-black font-semibold text-center text-xs uppercase tracking-wider hover:bg-[#8eb3ff] hover:shadow-lg hover:shadow-[#adc6ff]/30 hover:-translate-y-0.5 transition-all mt-1"
-              >
-                Get in Touch
-              </a>
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </header>
   );
 }
