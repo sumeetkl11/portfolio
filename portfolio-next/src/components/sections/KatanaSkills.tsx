@@ -4,152 +4,116 @@ import { useState, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { katanaSkills } from "@/lib/data";
+import { katanaSkills, techMarqueeItems } from "@/lib/data";
+import KineticHeading from "@/components/ui/KineticHeading";
 import dynamic from "next/dynamic";
 
-// Lazy load Three.js component to reduce initial bundle by ~180KB
 const KatanaScene = dynamic(() => import("@/components/ui/KatanaScene"), {
   loading: () => (
-    <div className="flex items-center justify-center w-full h-full">
+    <div className="flex items-center justify-center w-full h-full bg-[#0a0a0a]">
       <div className="text-center">
-        <div className="w-12 h-12 mx-auto mb-3 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-        <p className="text-sm font-mono text-zinc-400">Loading 3D Experience...</p>
+        <div className="w-8 h-8 mx-auto mb-3 border border-white/20 border-t-white rounded-full animate-spin" />
+        <p className="text-xs font-mono text-white/50 tracking-widest uppercase">
+          Initializing 3D Viewport...
+        </p>
       </div>
     </div>
   ),
   ssr: false,
 });
 
-gsap.registerPlugin(ScrollTrigger);
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export default function KatanaSkills() {
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLElement>(null);
   const cardWrapperRef = useRef<HTMLDivElement>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
-  const tagRef = useRef<HTMLDivElement>(null);
 
   const currentSkill = katanaSkills[activeIndex] || katanaSkills[0];
 
-  useGSAP(() => {
-    if (!containerRef.current || !cardWrapperRef.current) return;
+  useGSAP(
+    () => {
+      if (!containerRef.current || !cardWrapperRef.current) return;
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (prefersReducedMotion) return;
 
-    // Smooth scrubbed slide-up & float reveal as user scrolls from Projects into KatanaSkills
-    gsap.fromTo(
-      cardWrapperRef.current,
-      { y: 140, opacity: 0.2, scale: 0.94 },
-      {
-        y: 0,
-        opacity: 1,
-        scale: 1,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 95%",
-          end: "top 25%",
-          scrub: 1.2,
-          invalidateOnRefresh: true,
-        },
-      }
-    );
-
-    if (headingRef.current && tagRef.current) {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 65%",
-          end: "top 25%",
-          scrub: false,
-        },
-      });
-
-      tl.fromTo(
-        tagRef.current,
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" }
-      ).fromTo(
-        headingRef.current,
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
-        "-=0.4"
+      gsap.fromTo(
+        cardWrapperRef.current,
+        { y: 60, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top 75%",
+            once: true,
+          },
+        }
       );
-    }
-  }, { scope: containerRef });
+    },
+    { scope: containerRef }
+  );
 
   return (
     <section
       ref={containerRef}
       id="skills"
-      className="relative z-20 w-full py-30 md:py-40 bg-black text-white flex flex-col items-center justify-center border-t border-white/5 overflow-hidden select-none"
+      className="relative z-20 w-full py-28 md:py-36 bg-black text-white flex flex-col items-center justify-center border-t border-white/10 overflow-hidden select-none"
     >
-      {/* Cinematic subtle vignette backdrop */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(25,25,30,0.5)_0%,rgba(0,0,0,1)_80%)] pointer-events-none z-0" />
+      <div className="max-w-[1440px] w-full mx-auto px-6 sm:px-10 lg:px-16 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <span className="text-xs font-mono text-white/50 tracking-widest block mb-3">
+            03 · TECHNICAL ARSENAL
+          </span>
+          <KineticHeading
+            text="Core Stack & Tooling"
+            className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-white"
+          />
+        </div>
+        <p className="text-xs font-mono text-white/50">
+          INTERACTIVE 3D EXHIBITION · SCROLL OR DRAG BLADE
+        </p>
+      </div>
 
-      {/* ── Single Unified Card / Box Container (All content encapsulated inside) ── */}
-      <div ref={cardWrapperRef} className="relative z-20 w-full max-w-6xl h-[680px] md:h-[750px] mx-auto px-4 md:px-6">
-        <div className="relative w-full h-full rounded-3xl border border-white/10 bg-black/60 backdrop-blur-2xl shadow-[0_0_80px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col justify-between">
-          {/* Subtle inner card border highlight */}
-          <div className="absolute inset-0 pointer-events-none rounded-3xl border border-white/5 z-20" />
-          
-          {/* ── Fixed Header & Active Skill Text (Directly INSIDE Card at the top) ── */}
-          <div className="relative z-20 flex flex-col items-center pt-7 md:pt-9 px-4 pointer-events-none select-none">
-            {/* Technical Mastery Tag */}
-            <div 
-              ref={tagRef}
-              className="px-3.5 py-0.5 mb-2 text-[10px] md:text-xs tracking-[0.25em] font-mono border border-white/20 rounded-full text-white/60 uppercase backdrop-blur-md"
-            >
-              Technical Mastery
+      {/* Unified 3D Viewport Container (Zero backdrop-filter over WebGL) */}
+      <div
+        ref={cardWrapperRef}
+        className="relative z-20 w-full max-w-[1440px] h-[620px] md:h-[680px] mx-auto px-6 sm:px-10 lg:px-16"
+      >
+        <div
+          data-cursor="DRAG BLADE"
+          className="relative w-full h-full rounded-2xl border border-white/12 bg-[#0a0a0a] overflow-hidden flex flex-col justify-between"
+        >
+          {/* Top Non-Occluding Active Skill Readout */}
+          <div className="relative z-20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-6 px-6 md:px-10 pointer-events-none select-none border-b border-white/8 pb-5">
+            <div className="flex items-center gap-3 font-mono text-xs text-white/50 tabular-nums">
+              <span>MASTERY</span>
+              <span className="text-white font-semibold">
+                {String(activeIndex + 1).padStart(2, "0")} / {String(katanaSkills.length).padStart(2, "0")}
+              </span>
             </div>
 
-            {/* Main Heading */}
-            <h2 
-              ref={headingRef}
-              className="text-2xl md:text-4xl lg:text-5xl font-display uppercase tracking-widest text-center"
-            >
-              My Skills
-            </h2>
-
-            {/* ── Fixed DOM Active Skill Display ── */}
-            <div className="flex flex-col items-center mt-2 md:mt-3 transition-all duration-300 ease-out">
-              {/* Mastery Number Badge */}
+            <div className="flex items-center gap-4">
               <span
-                className="text-[9px] md:text-[11px] font-mono uppercase tracking-[0.22em] px-3 py-0.5 rounded-full border mb-1 backdrop-blur-md transition-all duration-500"
-                style={{
-                  borderColor: `${currentSkill.color}60`,
-                  backgroundColor: `${currentSkill.color}15`,
-                  color: currentSkill.color,
-                  boxShadow: `0 0 14px ${currentSkill.color}30`,
-                }}
+                key={currentSkill.id}
+                className="text-2xl md:text-3xl font-display font-extrabold tracking-tight text-white uppercase"
               >
-                Mastery {String(activeIndex + 1).padStart(2, "0")} / {katanaSkills.length}
+                {currentSkill.name}
               </span>
+            </div>
 
-              {/* Skill Title in Cinzel Display Typography */}
-              <div className="h-7 md:h-9 flex items-center justify-center">
-                <span
-                  key={currentSkill.id}
-                  className="text-xl md:text-3xl lg:text-4xl font-bold tracking-[0.20em] uppercase font-display transition-all duration-500 animate-in fade-in zoom-in-95"
-                  style={{
-                    color: "#ffffff",
-                    textShadow: `0 0 14px ${currentSkill.color}, 0 0 28px ${currentSkill.color}80, 0 0 50px ${currentSkill.color}40`,
-                  }}
-                >
-                  {currentSkill.name}
-                </span>
-              </div>
-
-              {/* Glowing Brand Gradient Accent Line */}
-              <div
-                className="w-16 md:w-24 h-[1.5px] mt-1 rounded-full transition-all duration-500"
-                style={{
-                  background: `linear-gradient(90deg, transparent 0%, ${currentSkill.color} 50%, transparent 100%)`,
-                  boxShadow: `0 0 8px ${currentSkill.color}`,
-                }}
-              />
+            <div className="hidden md:flex items-center gap-2 text-[11px] font-mono text-white/45">
+              <span>BLADE FORGE</span>
+              <span aria-hidden="true">·</span>
+              <span>ACTIVE NODE</span>
             </div>
           </div>
 
-          {/* ── 3D Scene (Positioned cleanly across card) ── */}
+          {/* 3D Katana Scene */}
           <div className="absolute inset-0 w-full h-full z-10 cursor-none">
             <KatanaScene
               skills={katanaSkills}
@@ -158,9 +122,28 @@ export default function KatanaSkills() {
             />
           </div>
 
-          {/* ── Subtitle / Control Cue inside bottom of card ── */}
-          <div className="relative z-20 pb-2 text-center text-[9px] md:text-[11px] font-mono text-white/30 tracking-widest uppercase pointer-events-none select-none">
-            Scroll or Drag to Explore · Finite Exhibition
+          {/* Bottom Helper Caption */}
+          <div className="relative z-20 pb-1.5 text-center text-[10px] font-mono text-white/35 tracking-widest uppercase pointer-events-none select-none">
+            Click Node or Drag Horizontally to Inspect
+          </div>
+        </div>
+      </div>
+
+      {/* Consolidated Monochrome Architectural Stack Ribbon */}
+      <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 mt-12">
+        <div className="w-full overflow-hidden border-y border-white/10 py-4 bg-[#0a0a0a]">
+          <div className="flex w-max animate-[marquee_32s_linear_infinite]">
+            {[...techMarqueeItems, ...techMarqueeItems].map((item, idx) => (
+              <div
+                key={`${item}-${idx}`}
+                className="flex items-center gap-6 px-3 text-xs font-mono text-white/65 tracking-wider uppercase whitespace-nowrap"
+              >
+                <span>{item}</span>
+                <span className="text-white/25" aria-hidden="true">
+                  ·
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
