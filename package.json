@@ -1,0 +1,14 @@
+{
+  "name": "sumit-scrollytelling-portfolio-root",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "portfolio-next"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=portfolio-next",
+    "build": "npm run build --workspace=portfolio-next",
+    "start": "npm run start --workspace=portfolio-next",
+    "lint": "npm run lint --workspace=portfolio-next"
+  }
+}

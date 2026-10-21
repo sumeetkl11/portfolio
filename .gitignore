@@ -39,6 +39,9 @@ MODERNIZATION_PLAN.md
 
 # Build & System artifacts
 .claude/
+.aistudio/
 .DS_Store
 Thumbs.db
 *.bat
+node_modules
+
