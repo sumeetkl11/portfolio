@@ -4,9 +4,15 @@ import { useEffect, useRef } from "react";
 import { experiences, education } from "@/lib/data";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { FileText, Download, ExternalLink, Briefcase, GraduationCap } from "lucide-react";
+import { FileText, ArrowUpRight, Briefcase, GraduationCap } from "lucide-react";
 import { useResumeModal } from "@/context/ResumeModalContext";
+import KineticHeading from "@/components/ui/KineticHeading";
+import Magnetic from "@/components/ui/Magnetic";
 import Link from "next/link";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export default function Experience() {
   const containerRef = useRef<HTMLElement>(null);
@@ -14,76 +20,98 @@ export default function Experience() {
   const { openResumeModal } = useResumeModal();
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
 
-    if (contentRef.current) {
-      const items = contentRef.current.querySelectorAll(".stagger-item");
-      gsap.fromTo(
-        items,
-        { opacity: 0, x: -30 },
-        {
-          opacity: 1,
-          x: 0,
-          duration: 0.8,
-          stagger: 0.12,
-          ease: "cubic-bezier(0.16, 1, 0.3, 1)",
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 70%",
-          },
-        }
-      );
-    }
+    const ctx = gsap.context(() => {
+      if (contentRef.current) {
+        const items = contentRef.current.querySelectorAll(".stagger-item");
+        gsap.fromTo(
+          items,
+          { opacity: 0, y: 24 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            stagger: 0.1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: containerRef.current,
+              start: "top 72%",
+              once: true,
+            },
+          }
+        );
+      }
+    }, containerRef);
+
+    return () => ctx.revert();
   }, []);
 
   return (
     <section
       ref={containerRef}
       id="experience"
-      className="py-30 md:py-40 bg-[#0a0a0b] relative border-t border-white/5 overflow-hidden"
+      className="py-28 md:py-36 bg-black relative border-t border-white/10 overflow-hidden"
     >
-      <div className="max-w-7xl xl:max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-20 relative z-10" ref={contentRef}>
+      <div
+        className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 relative z-10"
+        ref={contentRef}
+      >
         <div className="stagger-item mb-16 border-b border-white/10 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-[#adc6ff] animate-pulse" />
-              <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#adc6ff] font-semibold">
-                CAREER & MILESTONES
-              </span>
-            </div>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold uppercase tracking-wider text-white">
-              Experience & Education
-            </h2>
+            <span className="text-xs font-mono uppercase tracking-widest text-white/50 block mb-2.5">
+              05 · CAREER &amp; MILESTONES
+            </span>
+            <KineticHeading
+              text="Experience & Education"
+              className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-white"
+            />
           </div>
-          <span className="text-sm font-mono text-zinc-400">2022 — PRESENT</span>
+          <span className="text-xs font-mono text-white/50 tabular-nums">
+            2024 — PRESENT
+          </span>
         </div>
 
-        <div className="space-y-16">
-          {/* Experience List */}
-          <div className="stagger-item">
-            <div className="flex items-center gap-2 mb-8">
-              <Briefcase className="w-4 h-4 text-[#adc6ff]" />
-              <h3 className="text-sm font-mono text-[#adc6ff] uppercase tracking-widest font-semibold">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          {/* Professional Experience Column (7 cols) */}
+          <div className="stagger-item lg:col-span-7 space-y-6">
+            <div className="flex items-center gap-2.5 mb-6">
+              <Briefcase className="w-4 h-4 text-white/70" />
+              <h3 className="text-xs font-mono text-white/70 uppercase tracking-widest font-semibold">
                 Professional Experience
               </h3>
             </div>
-            <div className="space-y-10 border-l border-white/15 pl-8 ml-2">
+
+            <div className="space-y-6">
               {experiences.map((exp) => (
-                <div key={exp.id} className="relative group dark-glass-card p-6 rounded-2xl hover:border-[#adc6ff]/40 transition-all duration-300">
-                  <div className="absolute -left-[41px] top-7 w-2.5 h-2.5 rounded-full bg-white/30 group-hover:bg-[#adc6ff] group-hover:shadow-[0_0_12px_rgba(173,198,255,0.8)] transition-all duration-300" />
-                  <span className="text-xs font-mono text-[#adc6ff] mb-2 block tracking-wider">{exp.period}</span>
-                  <h4 className="text-2xl font-bold tracking-tight mb-1 text-white group-hover:text-[#adc6ff] transition-colors">
-                    {exp.role}
-                  </h4>
-                  <p className="text-base text-zinc-300 mb-4 font-medium">{exp.company}</p>
-                  <p className="text-zinc-400 text-sm leading-relaxed mb-4">{exp.description}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {exp.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-[10px] uppercase font-mono tracking-wider px-2 py-0.5 rounded bg-white/5 text-zinc-300 border border-white/10"
-                      >
-                        {tag}
+                <div
+                  key={exp.id}
+                  className="p-7 rounded-2xl bg-[#0a0a0a] border border-white/10 hover:border-white/30 transition-colors duration-200"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                    <h4 className="text-2xl font-display font-bold tracking-tight text-white">
+                      {exp.role}
+                    </h4>
+                    <span className="text-xs font-mono text-white/50 tabular-nums">
+                      {exp.period}
+                    </span>
+                  </div>
+                  <p className="text-sm font-mono text-white/75 mb-4">
+                    {exp.company}
+                  </p>
+                  <p className="text-white/60 text-sm leading-relaxed mb-5">
+                    {exp.description}
+                  </p>
+                  <div className="pt-4 border-t border-white/10 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] font-mono text-white/60">
+                    {exp.tags.map((tag, idx) => (
+                      <span key={tag} className="inline-flex items-center gap-2.5">
+                        <span>{tag}</span>
+                        {idx < exp.tags.length - 1 && (
+                          <span className="text-white/25" aria-hidden="true">
+                            ·
+                          </span>
+                        )}
                       </span>
                     ))}
                   </div>
@@ -92,62 +120,69 @@ export default function Experience() {
             </div>
           </div>
 
-          {/* Education List */}
-          <div className="stagger-item pt-4">
-            <div className="flex items-center gap-2 mb-8">
-              <GraduationCap className="w-4 h-4 text-[#d0bcff]" />
-              <h3 className="text-sm font-mono text-[#d0bcff] uppercase tracking-widest font-semibold">
-                Formal Education
+          {/* Formal Education Column (5 cols) */}
+          <div className="stagger-item lg:col-span-5 space-y-6">
+            <div className="flex items-center gap-2.5 mb-6">
+              <GraduationCap className="w-4 h-4 text-white/70" />
+              <h3 className="text-xs font-mono text-white/70 uppercase tracking-widest font-semibold">
+                Academic Foundation
               </h3>
             </div>
-            <div className="space-y-10 border-l border-white/15 pl-8 ml-2">
+
+            <div className="space-y-6">
               {education.map((edu) => (
-                <div key={edu.id} className="relative group dark-glass-card p-6 rounded-2xl hover:border-[#d0bcff]/40 transition-all duration-300">
-                  <div className="absolute -left-[41px] top-7 w-2.5 h-2.5 rounded-full bg-white/30 group-hover:bg-[#d0bcff] group-hover:shadow-[0_0_12px_rgba(208,188,255,0.8)] transition-all duration-300" />
-                  <span className="text-xs font-mono text-[#d0bcff] mb-2 block tracking-wider">{edu.period}</span>
-                  <h4 className="text-2xl font-bold tracking-tight mb-1 text-white group-hover:text-[#d0bcff] transition-colors">
+                <div
+                  key={edu.id}
+                  className="p-7 rounded-2xl bg-[#0a0a0a] border border-white/10 hover:border-white/30 transition-colors duration-200"
+                >
+                  <span className="text-xs font-mono text-white/50 block mb-2 tabular-nums">
+                    {edu.period}
+                  </span>
+                  <h4 className="text-2xl font-display font-bold tracking-tight mb-1.5 text-white">
                     {edu.degree}
                   </h4>
-                  <p className="text-base text-zinc-300 mb-4 font-medium">{edu.institution}</p>
-                  <p className="text-zinc-400 text-sm leading-relaxed">{edu.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* CV & Credentials Milestone Banner */}
-          <div className="stagger-item pt-8">
-            <div className="rounded-2xl border border-white/15 bg-gradient-to-r from-zinc-950 via-zinc-900 to-zinc-950 p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-2xl shadow-black/60">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-[#adc6ff]/15 border border-[#adc6ff]/30 flex items-center justify-center flex-shrink-0 text-[#adc6ff]">
-                  <FileText className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="text-lg sm:text-xl font-bold font-display uppercase tracking-wider text-white">
-                    Need Sumeet's Full Verified CV?
-                  </h4>
-                  <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-xl leading-relaxed">
-                    Access the complete document with detailed project metrics, technical stacks, coursework, and contact credentials.
+                  <p className="text-sm font-mono text-white/75 mb-4">
+                    {edu.institution}
+                  </p>
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    {edu.description}
                   </p>
                 </div>
-              </div>
+              ))}
 
-              <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                <button
-                  onClick={openResumeModal}
-                  className="flex-1 md:flex-initial px-5 py-3 rounded-xl bg-white text-black font-semibold text-xs uppercase tracking-wider hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-white/10 active:scale-[0.98]"
-                >
-                  <FileText className="w-4 h-4" />
-                  <span>Review CV</span>
-                </button>
-                <a
-                  href={process.env.NEXT_PUBLIC_RESUME_URL || "/resume.pdf"}
-                  download="Sumeet_Kanhiya_CV.pdf"
-                  className="flex-1 md:flex-initial px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-mono text-xs uppercase tracking-wider border border-white/15 transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download PDF</span>
-                </a>
+              {/* CV & Credentials Milestone Card */}
+              <div className="p-7 rounded-2xl bg-[#0a0a0a] border border-white/15 flex flex-col justify-between gap-6">
+                <div>
+                  <span className="text-[11px] font-mono uppercase tracking-widest text-white/45 block mb-2">
+                    COMPLETE ARCHITECTURAL RECORD
+                  </span>
+                  <h4 className="text-xl font-display font-bold tracking-tight text-white">
+                    Curriculum Vitae &amp; Technical Dossier
+                  </h4>
+                  <p className="text-xs sm:text-sm text-white/60 mt-2 leading-relaxed">
+                    Inspect the full ATS-ready specification including distributed systems benchmarks, coursework, and verified credentials.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <Magnetic>
+                    <button
+                      type="button"
+                      onClick={openResumeModal}
+                      className="px-5 py-2.5 rounded-lg bg-white text-black font-semibold text-xs tracking-wide hover:bg-zinc-200 transition-colors inline-flex items-center gap-2 cursor-pointer whitespace-nowrap"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>Review Interactive CV</span>
+                    </button>
+                  </Magnetic>
+                  <Link
+                    href="/resume"
+                    className="px-4 py-2.5 rounded-lg bg-white/5 hover:bg-white/15 text-white font-mono text-xs border border-white/15 transition-colors inline-flex items-center gap-1.5 whitespace-nowrap"
+                  >
+                    <span>Full CV Page</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
