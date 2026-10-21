@@ -106,14 +106,14 @@ export const techMarqueeItems = [
 ];
 
 export const katanaSkills = [
-  { id: "typescript", name: "TypeScript", color: "#3178C6" },
-  { id: "nextjs",     name: "Next.js",    color: "#E2E8F0" },
-  { id: "postgresql", name: "PostgreSQL", color: "#336791" },
-  { id: "react",      name: "React",      color: "#61DAFB" },
-  { id: "nodejs",     name: "Node.js",    color: "#6BBF59" },
-  { id: "redis",      name: "Redis",      color: "#EF4444" },
-  { id: "gemini",     name: "Gemini API", color: "#8B5CF6" },
-  { id: "websockets", name: "WebSockets", color: "#06B6D4" },
-  { id: "express",    name: "Express.js", color: "#EAB308" },
-  { id: "git",        name: "Git & GitHub", color: "#F05032" },
+  { id: "typescript", name: "TypeScript", color: "#FFFFFF" },
+  { id: "nextjs",     name: "Next.js",    color: "#E4E4E7" },
+  { id: "postgresql", name: "PostgreSQL", color: "#D4D4D8" },
+  { id: "react",      name: "React",      color: "#FAFAFA" },
+  { id: "nodejs",     name: "Node.js",    color: "#E4E4E7" },
+  { id: "redis",      name: "Redis",      color: "#D4D4D8" },
+  { id: "gemini",     name: "Gemini API", color: "#FFFFFF" },
+  { id: "websockets", name: "WebSockets", color: "#E4E4E7" },
+  { id: "express",    name: "Express.js", color: "#D4D4D8" },
+  { id: "git",        name: "Git & GitHub", color: "#A1A1AA" },
 ];
