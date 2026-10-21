@@ -9,11 +9,17 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import { FormInput, FormTextarea, FormButton } from "@/components/ui/form";
-import { contactFormSchema, ContactFormData, ContactFormInput, FormStatus } from "@/lib/formValidation";
+import KineticHeading from "@/components/ui/KineticHeading";
+import Magnetic from "@/components/ui/Magnetic";
+import {
+  contactFormSchema,
+  ContactFormData,
+  ContactFormInput,
+  FormStatus,
+} from "@/lib/formValidation";
 import { useRateLimitTimer } from "@/hooks/useRateLimitTimer";
-import { animateFieldEntry, animateFormSuccess } from "@/hooks/useFormAnimation";
+import { animateFormSuccess } from "@/hooks/useFormAnimation";
 
-// Register GSAP plugin
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -35,7 +41,7 @@ export default function Contact() {
     formState: { errors, isSubmitting },
     trigger,
     watch,
-  } = useForm<ContactFormInput, any, ContactFormData>({
+  } = useForm<ContactFormInput, unknown, ContactFormData>({
     resolver: zodResolver(contactFormSchema),
     mode: "onBlur",
     defaultValues: {
@@ -46,58 +52,47 @@ export default function Contact() {
     },
   });
 
-  // Watch form values for validation states
   const nameValue = watch("name");
   const emailValue = watch("email");
   const messageValue = watch("message");
 
-  // Check if fields are valid
-  const isNameValid = nameValue && nameValue.length >= 2 && !errors.name;
-  const isEmailValid = emailValue && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue) && !errors.email;
-  const isMessageValid = messageValue && messageValue.length >= 10 && !errors.message;
+  const isNameValid = Boolean(nameValue && nameValue.length >= 2 && !errors.name);
+  const isEmailValid = Boolean(
+    emailValue && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue) && !errors.email
+  );
+  const isMessageValid = Boolean(messageValue && messageValue.length >= 10 && !errors.message);
 
-  // Entry animations on scroll
   useEffect(() => {
     if (!sectionRef.current) return;
-
     const fields = fieldsRef.current.filter(Boolean);
     if (fields.length === 0) return;
 
-    // Animate fields with stagger
-    fields.forEach((field, index) => {
-      if (field) {
-        animateFieldEntry(field, index * 0.15);
-      }
-    });
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) {
+      gsap.set(fields, { opacity: 1, y: 0 });
+      return;
+    }
 
-    // ScrollTrigger for visibility
-    const st = ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: "top 70%",
-      once: true,
-      onEnter: () => {
-        fields.forEach((field, index) => {
-          if (field) {
-            gsap.fromTo(
-              field,
-              { opacity: 0, y: 40, rotateX: 10 },
-              {
-                opacity: 1,
-                y: 0,
-                rotateX: 0,
-                duration: 0.8,
-                delay: index * 0.15,
-                ease: "expo.out",
-              }
-            );
-          }
-        });
-      },
-    });
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        fields,
+        { opacity: 0, y: 24 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.65,
+          stagger: 0.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 75%",
+            once: true,
+          },
+        }
+      );
+    }, sectionRef);
 
-    return () => {
-      st.kill();
-    };
+    return () => ctx.revert();
   }, []);
 
   const onSubmit = async (data: ContactFormData) => {
@@ -113,7 +108,9 @@ export default function Contact() {
 
       if (response.status === 429) {
         setSubmitStatus("rate-limited");
-        setErrorMessage(`Rate limit exceeded. Please wait ${secondsRemaining || 60} seconds.`);
+        setErrorMessage(
+          `Rate limit exceeded. Please wait ${secondsRemaining || 60} seconds.`
+        );
         startTimer(60);
         return;
       }
@@ -125,7 +122,6 @@ export default function Contact() {
 
       setSubmitStatus("success");
 
-      // Animate success
       if (formRef.current && successRef.current) {
         animateFormSuccess(formRef.current, successRef.current, () => {
           reset();
@@ -140,7 +136,9 @@ export default function Contact() {
     } catch (error) {
       setSubmitStatus("error");
       setErrorMessage(
-        error instanceof Error ? error.message : "Transmission failed. Please try again."
+        error instanceof Error
+          ? error.message
+          : "Transmission failed. Please try again."
       );
     }
   };
@@ -149,38 +147,31 @@ export default function Contact() {
     <section
       id="contact"
       ref={sectionRef}
-      className="py-32 bg-black relative overflow-hidden"
+      className="py-28 md:py-36 bg-black relative border-t border-white/10 overflow-hidden"
     >
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent pointer-events-none" />
-
-      <div className="max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
+      <div className="max-w-4xl mx-auto px-6 sm:px-10 relative z-10">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-display font-bold uppercase tracking-wider mb-4">
-            Get In Touch
-          </h2>
-          <p className="text-zinc-400 text-lg mb-6">
-            Have a project in mind or want to collaborate?
-            <br />
-            Let&apos;s talk.
-          </p>
-
-          <div className="flex items-center justify-center gap-4">
-            <a
-              href={profile.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0077B5]/15 hover:bg-[#0077B5]/25 text-[#0077B5] hover:text-white border border-[#0077B5]/30 text-xs font-mono font-medium transition-all duration-300 hover:scale-105 group"
-              title="Connect with Sumeet on LinkedIn"
-            >
-              <svg className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
-                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-              </svg>
-              <span>Connect on LinkedIn</span>
-              <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-            </a>
+        <div className="mb-14 border-b border-white/10 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <span className="text-xs font-mono uppercase tracking-widest text-white/50 block mb-2.5">
+              06 · DIRECT DISPATCH
+            </span>
+            <KineticHeading
+              text="Initiate Dialogue"
+              className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-white"
+            />
           </div>
+
+          <a
+            href={profile.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#0a0a0a] hover:border-white/40 text-white/80 hover:text-white border border-white/15 text-xs font-mono transition-colors whitespace-nowrap self-start md:self-auto"
+            title="Connect with Sumeet on LinkedIn"
+          >
+            <span>Connect on LinkedIn</span>
+            <ArrowUpRight className="w-3.5 h-3.5" />
+          </a>
         </div>
 
         {/* Form */}
@@ -190,7 +181,7 @@ export default function Contact() {
           className="space-y-8"
           noValidate
         >
-          {/* Honeypot field (hidden) */}
+          {/* Honeypot field */}
           <input
             {...register("website")}
             type="text"
@@ -203,8 +194,10 @@ export default function Contact() {
 
           {/* Name & Email Row */}
           <div
-            ref={(el) => { fieldsRef.current[0] = el; }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6 opacity-0 relative z-10"
+            ref={(el) => {
+              fieldsRef.current[0] = el;
+            }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10"
           >
             <FormInput
               {...register("name", {
@@ -216,7 +209,7 @@ export default function Contact() {
               placeholder="Enter your name"
               icon={User}
               error={errors.name?.message}
-              isValid={Boolean(isNameValid)}
+              isValid={isNameValid}
               required
             />
 
@@ -227,18 +220,20 @@ export default function Contact() {
               id="email"
               type="email"
               label="Email"
-              placeholder="example.at@gmail.com"
+              placeholder="name@company.com"
               icon={Mail}
               error={errors.email?.message}
-              isValid={Boolean(isEmailValid)}
+              isValid={isEmailValid}
               required
             />
           </div>
 
           {/* Message Field */}
           <div
-            ref={(el) => { fieldsRef.current[1] = el; }}
-            className="opacity-0 relative z-10"
+            ref={(el) => {
+              fieldsRef.current[1] = el;
+            }}
+            className="relative z-10"
           >
             <FormTextarea
               {...register("message", {
@@ -246,10 +241,10 @@ export default function Contact() {
               })}
               id="message"
               label="Message"
-              placeholder="How can I help you?"
+              placeholder="Describe your architectural requirements or project timeline..."
               icon={MessageSquare}
               error={errors.message?.message}
-              isValid={Boolean(isMessageValid)}
+              isValid={isMessageValid}
               showCounter
               maxLength={1000}
               rows={5}
@@ -259,33 +254,36 @@ export default function Contact() {
 
           {/* Submit Button */}
           <div
-            ref={(el) => { fieldsRef.current[2] = el; }}
-            className="opacity-0"
+            ref={(el) => {
+              fieldsRef.current[2] = el;
+            }}
           >
-            <FormButton
-              type="submit"
-              isLoading={submitStatus === "submitting"}
-              isSuccess={submitStatus === "success"}
-              isError={submitStatus === "error"}
-              disabled={isSubmitting || isRateLimited}
-              loadingText="Sending..."
-              successText="Message Sent"
-              errorText="Failed to Send"
-            >
-              Send Message
-            </FormButton>
+            <Magnetic className="w-full block">
+              <FormButton
+                type="submit"
+                isLoading={submitStatus === "submitting"}
+                isSuccess={submitStatus === "success"}
+                isError={submitStatus === "error"}
+                disabled={isSubmitting || isRateLimited}
+                loadingText="Sending..."
+                successText="Message Sent"
+                errorText="Failed to Send"
+              >
+                Send Message
+              </FormButton>
+            </Magnetic>
           </div>
 
-          {/* Rate Limit Message */}
+          {/* Rate Limit Cooldown (Compositor scaleX instead of layout width) */}
           {isRateLimited && (
-            <div className="flex items-center justify-center gap-3 p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-              <div className="relative w-48 h-2 bg-white/10 rounded-full overflow-hidden">
+            <div className="flex items-center justify-center gap-4 p-4 rounded-lg bg-[#0a0a0a] border border-white/20">
+              <div className="relative w-48 h-1.5 bg-white/10 rounded-full overflow-hidden">
                 <div
-                  className="absolute inset-y-0 left-0 bg-yellow-400 transition-all duration-1000 ease-linear"
-                  style={{ width: `${(secondsRemaining / 60) * 100}%` }}
+                  className="absolute inset-0 bg-white origin-left transition-transform duration-1000 ease-linear"
+                  style={{ transform: `scaleX(${Math.max(0, secondsRemaining / 60)})` }}
                 />
               </div>
-              <p className="text-yellow-400 text-sm font-mono">
+              <p className="text-white/80 text-xs font-mono tabular-nums">
                 Cooldown: {secondsRemaining}s
               </p>
             </div>
@@ -296,7 +294,7 @@ export default function Contact() {
             <div
               role="alert"
               aria-live="assertive"
-              className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-center text-sm font-mono"
+              className="p-4 rounded-lg bg-[#0a0a0a] border border-red-500/40 text-red-400 text-center text-xs font-mono"
             >
               {errorMessage}
             </div>
@@ -310,10 +308,10 @@ export default function Contact() {
           aria-live="polite"
           aria-atomic="true"
         >
-          <div className="text-center p-8 rounded-2xl enhanced-glass max-w-md">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-500/20 flex items-center justify-center">
+          <div className="text-center p-8 rounded-2xl bg-[#0a0a0a] border border-white/20 max-w-md">
+            <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
               <svg
-                className="w-8 h-8 text-emerald-400"
+                className="w-6 h-6 text-white"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -326,9 +324,11 @@ export default function Contact() {
                 />
               </svg>
             </div>
-            <h3 className="text-2xl font-display font-bold mb-2">Message Sent Successfully</h3>
-            <p className="text-zinc-400 font-mono text-sm">
-              Thanks for reaching out! I&apos;ll get back to you soon.
+            <h3 className="text-2xl font-display font-bold mb-2 text-white">
+              Message Sent
+            </h3>
+            <p className="text-white/60 font-mono text-xs">
+              Thank you for reaching out. I will respond shortly.
             </p>
           </div>
         </div>
