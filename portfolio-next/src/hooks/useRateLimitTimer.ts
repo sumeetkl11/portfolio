@@ -6,7 +6,6 @@ export function useRateLimitTimer(initialSeconds: number = 0) {
 
   useEffect(() => {
     if (!isActive || secondsRemaining <= 0) {
-      setIsActive(false);
       return;
     }
 
