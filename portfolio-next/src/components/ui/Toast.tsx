@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { CheckCircle2, AlertCircle, Loader2, X } from "lucide-react";
 import gsap from "gsap";
 
@@ -25,6 +25,21 @@ export default function Toast({
 }: ToastProps) {
   const toastRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleDismiss = useCallback(() => {
+    if (toastRef.current) {
+      gsap.to(toastRef.current, {
+        opacity: 0,
+        y: 20,
+        scale: 0.95,
+        duration: 0.3,
+        ease: "power2.in",
+        onComplete: onClose,
+      });
+    } else {
+      onClose();
+    }
+  }, [onClose]);
 
   useEffect(() => {
     if (timerRef.current) {
@@ -60,22 +75,7 @@ export default function Toast({
         clearTimeout(timerRef.current);
       }
     };
-  }, [isOpen, type, duration, title, message]);
-
-  const handleDismiss = () => {
-    if (toastRef.current) {
-      gsap.to(toastRef.current, {
-        opacity: 0,
-        y: 20,
-        scale: 0.95,
-        duration: 0.3,
-        ease: "power2.in",
-        onComplete: onClose,
-      });
-    } else {
-      onClose();
-    }
-  };
+  }, [isOpen, type, duration, title, message, handleDismiss]);
 
   if (!isOpen) return null;
 
