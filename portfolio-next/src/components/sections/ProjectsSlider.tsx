@@ -1,11 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { projects, type Project } from "@/lib/data";
+import { useEffect, useRef } from "react";
+import { projects } from "@/lib/data";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import CinematicDialog from "@/components/ui/CinematicDialog";
-import { ExternalLink, Layers, ArrowUpRight } from "lucide-react";
+import KineticHeading from "@/components/ui/KineticHeading";
+import { useResumeModal } from "@/context/ResumeModalContext";
+import { ExternalLink, ArrowUpRight } from "lucide-react";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
@@ -17,90 +23,77 @@ function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
 
 export default function ProjectsSlider() {
   const sectionRef = useRef<HTMLElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
   const sliderTrackRef = useRef<HTMLDivElement>(null);
-
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const { activeProject, openProjectModal, closeProjectModal } = useResumeModal();
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    if (titleRef.current) {
-      gsap.fromTo(
-        titleRef.current,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: titleRef.current,
-            start: "top 80%",
-          },
-        }
-      );
-    }
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
 
     const slider = sliderTrackRef.current;
     const section = sectionRef.current;
-    if (section && slider) {
-      const getScrollAmount = () => {
-        if (!slider) return 0;
-        const cards = slider.querySelectorAll<HTMLElement>(".project-card");
-        const lastCard = cards[cards.length - 1];
-        if (!lastCard) return -(slider.scrollWidth - window.innerWidth);
+    if (!section || !slider) return;
 
-        const cardCenterInTrack = lastCard.offsetLeft + lastCard.offsetWidth / 2;
-        const targetX = window.innerWidth / 2 - cardCenterInTrack;
-        return Math.min(0, targetX);
-      };
+    const getScrollAmount = () => {
+      if (!slider) return 0;
+      const cards = slider.querySelectorAll<HTMLElement>(".project-card");
+      const lastCard = cards[cards.length - 1];
+      if (!lastCard) return -(slider.scrollWidth - window.innerWidth);
 
-      const ctx = gsap.context(() => {
-        const horizontalDistance = Math.abs(getScrollAmount());
-        const scrollDistanceForAnimation = horizontalDistance * 2;
-        const holdDistance = window.innerHeight * 0.6;
-        const totalScrollDistance = scrollDistanceForAnimation + holdDistance;
+      const cardCenterInTrack = lastCard.offsetLeft + lastCard.offsetWidth / 2;
+      const targetX = window.innerWidth / 2 - cardCenterInTrack;
+      return Math.min(0, targetX);
+    };
 
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: section,
-            start: "top top",
-            end: () => `+=${totalScrollDistance}`,
-            pin: true,
-            pinSpacing: true,
-            scrub: 1,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          },
-        });
+    const ctx = gsap.context(() => {
+      const horizontalDistance = Math.abs(getScrollAmount());
+      const scrollDistanceForAnimation = horizontalDistance * 1.8;
+      const holdDistance = window.innerHeight * 0.45;
+      const totalScrollDistance = scrollDistanceForAnimation + holdDistance;
 
-        const animationPhase = scrollDistanceForAnimation / totalScrollDistance;
-        const holdPhase = holdDistance / totalScrollDistance;
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: () => `+=${totalScrollDistance}`,
+          pin: true,
+          pinSpacing: true,
+          scrub: 1,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        },
+      });
 
-        tl.to(slider, {
-          x: () => getScrollAmount(),
-          ease: "none",
-          duration: animationPhase,
-        }).to({}, {
+      const animationPhase = scrollDistanceForAnimation / totalScrollDistance;
+      const holdPhase = holdDistance / totalScrollDistance;
+
+      tl.to(slider, {
+        x: () => getScrollAmount(),
+        ease: "none",
+        duration: animationPhase,
+      }).to(
+        {},
+        {
           duration: holdPhase,
-        });
-      }, sectionRef);
+        }
+      );
+    }, sectionRef);
 
+    if (typeof document !== "undefined" && document.fonts?.ready) {
       document.fonts.ready.then(() => {
         ScrollTrigger.refresh();
       });
-
-      const handleResize = () => {
-        ScrollTrigger.refresh();
-      };
-      window.addEventListener("resize", handleResize);
-
-      return () => {
-        window.removeEventListener("resize", handleResize);
-        ctx.revert();
-      };
     }
+
+    const handleResize = () => {
+      ScrollTrigger.refresh();
+    };
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      ctx.revert();
+    };
   }, []);
 
   return (
@@ -108,77 +101,69 @@ export default function ProjectsSlider() {
       <section
         ref={sectionRef}
         id="projects"
-        className="h-screen w-full relative bg-[#0a0a0b] overflow-hidden flex flex-col justify-center z-10 border-t border-white/5"
+        className="h-screen w-full relative bg-black overflow-hidden flex flex-col justify-center z-10 border-t border-white/10"
       >
-        {/* Subtle grid background */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
-
-        <div className="w-full px-6 md:px-12 relative z-10 mb-6 md:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="max-w-[1440px] w-full mx-auto px-6 sm:px-10 lg:px-16 relative z-10 mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-[#adc6ff] animate-pulse" />
-              <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#adc6ff] font-semibold">
-                FEATURED ARCHITECTURES
-              </span>
-            </div>
-            <h2
-              ref={titleRef}
-              className="text-4xl md:text-5xl lg:text-7xl font-display font-bold uppercase tracking-wider text-white"
-            >
-              Projects
-            </h2>
+            <span className="text-xs font-mono text-white/50 uppercase tracking-widest block mb-2.5">
+              02 · FEATURED ARCHITECTURES
+            </span>
+            <KineticHeading
+              text="Selected Works"
+              className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-white"
+            />
           </div>
-          <span className="text-xs font-mono text-zinc-400 hidden md:block">
-
+          <span className="text-xs font-mono text-white/50 hidden md:block">
+            SCROLL TO INSPECT SYSTEMS · CLICK FOR TRD (OR PRESS ⌘K)
           </span>
         </div>
 
         <div className="relative z-10 w-full overflow-visible">
           <div
             ref={sliderTrackRef}
-            className="flex gap-8 px-6 md:px-12 w-max items-stretch"
+            className="flex gap-8 px-6 sm:px-10 lg:px-16 w-max items-stretch will-change-transform"
           >
             {projects.map((project, i) => (
               <div
                 key={project.id}
                 role="button"
                 tabIndex={0}
+                data-cursor="VIEW SPEC"
                 aria-label={`Inspect ${project.title} architecture`}
-                onClick={() => setSelectedProject(project)}
+                onClick={() => openProjectModal(project)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-                    setSelectedProject(project);
+                    openProjectModal(project);
                   }
                 }}
-                className="project-card group relative w-[85vw] sm:w-[60vw] md:w-[45vw] lg:w-[35vw] h-[55vh] min-h-[460px] max-h-[580px] rounded-3xl overflow-hidden cursor-pointer dark-glass-card border border-white/10 hover:border-[#adc6ff]/50 transition-all duration-500 bg-zinc-950/70 flex flex-col justify-between p-6 md:p-8 flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#adc6ff] hover:shadow-[0_0_40px_rgba(173,198,255,0.15)]"
+                className="project-card group relative w-[85vw] sm:w-[60vw] md:w-[44vw] lg:w-[34vw] h-[54vh] min-h-[450px] max-h-[560px] rounded-2xl overflow-hidden cursor-pointer bg-[#0a0a0a] border border-white/10 hover:border-white/35 transition-colors duration-200 flex flex-col justify-between p-7 md:p-8 flex-shrink-0 focus:outline-none"
               >
-                {/* Background Ambient Radial Glow */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#adc6ff]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-
-                {/* Project Sequence Number */}
-                <div className="text-6xl md:text-8xl font-display font-bold text-white/5 group-hover:text-white/10 transition-colors duration-500 absolute top-4 right-8 pointer-events-none">
-                  {(i + 1).toString().padStart(2, "0")}
-                </div>
-
                 <div className="relative z-10">
-                  <span className="text-[11px] font-mono text-[#adc6ff] uppercase tracking-widest block mb-3 font-medium">
-                    {project.category}
-                  </span>
-                  <h3 className="text-2xl md:text-3xl font-bold tracking-tight mb-3 text-white group-hover:text-[#adc6ff] transition-colors duration-300">
+                  {/* Editorial Unboxed Kicker (Zero Ghost Watermark) */}
+                  <div className="flex items-center justify-between gap-2 text-xs font-mono text-white/50 mb-4">
+                    <span>{project.category}</span>
+                    <span className="tabular-nums text-white/40">
+                      0{i + 1} / 0{projects.length}
+                    </span>
+                  </div>
+
+                  <h3 className="text-2xl md:text-3xl font-display font-bold tracking-tight mb-3 text-white group-hover:text-white/90 transition-colors">
                     {project.title}
                   </h3>
 
-                  <p className="text-zinc-400 text-xs md:text-sm line-clamp-3 mb-4 leading-relaxed transition-colors duration-300 group-hover:text-zinc-300">
+                  <p className="text-white/60 text-xs md:text-sm line-clamp-3 mb-6 leading-relaxed">
                     {project.description}
                   </p>
 
                   {project.metrics && (
-                    <div className="grid grid-cols-2 gap-2 mb-4 p-3 rounded-xl bg-white/[0.03] border border-white/5 font-mono">
+                    <div className="grid grid-cols-2 gap-4 py-3.5 border-y border-white/10 font-mono">
                       {project.metrics.map((metric, idx) => (
                         <div key={idx} className="flex flex-col">
-                          <span className="text-[10px] text-zinc-400 uppercase tracking-wider">{metric.label}:</span>
-                          <span className="text-xs text-zinc-200 font-semibold group-hover:text-white transition-colors">
+                          <span className="text-[10px] text-white/45 uppercase tracking-wider">
+                            {metric.label}
+                          </span>
+                          <span className="text-sm text-white font-semibold tabular-nums mt-0.5">
                             {metric.value}
                           </span>
                         </div>
@@ -187,36 +172,34 @@ export default function ProjectsSlider() {
                   )}
                 </div>
 
-                <div className="relative z-10 mt-auto pt-4 flex flex-col gap-3">
-                  <div className="flex flex-wrap gap-2">
-                    {project.techStack.slice(0, 4).map((tech) => (
-                      <span
-                        key={tech}
-                        className="text-[10px] uppercase font-mono tracking-wider px-2.5 py-1 rounded-md bg-white/5 text-zinc-300 border border-white/5 group-hover:border-[#adc6ff]/20 transition-colors"
-                      >
-                        {tech}
+                <div className="relative z-10 mt-auto pt-4 flex flex-col gap-4">
+                  {/* Unboxed Tech Stack Metadata with Typographic Separators */}
+                  <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] font-mono text-white/60">
+                    {project.techStack.map((tech, idx) => (
+                      <span key={tech} className="inline-flex items-center gap-2.5">
+                        <span>{tech}</span>
+                        {idx < project.techStack.length - 1 && (
+                          <span className="text-white/25" aria-hidden="true">
+                            ·
+                          </span>
+                        )}
                       </span>
                     ))}
-                    {project.techStack.length > 4 && (
-                      <span className="text-[10px] uppercase font-mono tracking-wider px-2.5 py-1 rounded-md bg-white/5 text-zinc-400 border border-white/5">
-                        +{project.techStack.length - 4}
-                      </span>
-                    )}
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-white/10 mt-1">
-                    <div className="flex items-center gap-4">
+                  <div className="flex items-center justify-between pt-3 border-t border-white/10">
+                    <div className="flex items-center gap-5">
                       {project.repoUrl && (
                         <a
                           href={project.repoUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-white transition-colors cursor-pointer relative z-20 py-1"
+                          className="flex items-center gap-1.5 text-xs font-mono text-white/60 hover:text-white transition-colors cursor-pointer relative z-20 py-1 whitespace-nowrap"
                           title="View Source Code"
                         >
                           <GithubIcon className="w-3.5 h-3.5" />
-                          <span>Code</span>
+                          <span>Source</span>
                         </a>
                       )}
                       {project.liveUrl && (
@@ -225,34 +208,32 @@ export default function ProjectsSlider() {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-white transition-colors cursor-pointer relative z-20 py-1"
+                          className="flex items-center gap-1.5 text-xs font-mono text-white/60 hover:text-white transition-colors cursor-pointer relative z-20 py-1 whitespace-nowrap"
                           title="View Live Deployment"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
-                          <span>Live</span>
+                          <span>Live Deployment</span>
                         </a>
                       )}
                     </div>
 
-                    <span className="text-[11px] font-mono text-[#adc6ff] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                      <span>TRD Details</span>
+                    <span className="text-xs font-mono text-white/70 group-hover:text-white transition-colors flex items-center gap-1 whitespace-nowrap">
+                      <span>Inspect TRD</span>
                       <ArrowUpRight className="w-3.5 h-3.5" />
                     </span>
                   </div>
                 </div>
               </div>
             ))}
-            {/* Trailing Buffer Spacer */}
             <div className="w-[12vw] md:w-[18vw] flex-shrink-0" />
           </div>
         </div>
       </section>
 
-      {/* Cinematic Modal */}
       <CinematicDialog
-        project={selectedProject}
-        isOpen={Boolean(selectedProject)}
-        onClose={() => setSelectedProject(null)}
+        project={activeProject}
+        isOpen={Boolean(activeProject)}
+        onClose={closeProjectModal}
       />
     </>
   );
