@@ -179,9 +179,7 @@ export default function KatanaModel({
     scGroup.position.y = 0.0858;
 
     return { swordGroup: sGroup, scabbardGroup: scGroup };
-  }, [gltf.scene, skill.id, skill.color]);
-
-  swordGroupRef.current = swordGroup;
+  }, [gltf.scene, skill.color]);
 
   // Animation state values
   const anim = useRef({
@@ -202,7 +200,8 @@ export default function KatanaModel({
 
   useFrame((_state, delta) => {
     const a = anim.current;
-    if (!swordGroup) return;
+    const activeSwordGroup = swordGroupRef.current;
+    if (!activeSwordGroup) return;
 
     const t = 1 - Math.exp(-12 * delta);
     const carouselLerp = 1 - Math.exp(-14 * delta);
@@ -223,7 +222,7 @@ export default function KatanaModel({
     }
 
     // ── Strictly the active center Katana is drawn (Instant, zero-lag response) ──
-    const shouldDraw = isCenter;
+    const shouldDraw = isCenter || isHovered;
 
     if (shouldDraw) {
       // Gentle lift and immediate synchronized blade reveal
@@ -249,9 +248,9 @@ export default function KatanaModel({
     const arcY = ARC_YC + (-ARC_YC * Math.cos(dTheta) + ARC_ZC * Math.sin(dTheta));
     const arcZ = ARC_ZC + (-ARC_YC * Math.sin(dTheta) - ARC_ZC * Math.cos(dTheta));
 
-    swordGroup.position.y = arcY;
-    swordGroup.position.z = arcZ;
-    swordGroup.rotation.x = dTheta;
+    activeSwordGroup.position.y = arcY;
+    activeSwordGroup.position.z = arcZ;
+    activeSwordGroup.rotation.x = dTheta;
 
     if (bladeGlowRef.current) {
       bladeGlowRef.current.intensity = a._glowIntensity;
@@ -287,7 +286,7 @@ export default function KatanaModel({
         <primitive object={scabbardGroup} />
 
         {/* SwordGroup: Blade, Guard, and Handle move together along the circular arc */}
-        <primitive object={swordGroup}>
+        <primitive ref={swordGroupRef} object={swordGroup}>
           {/* Subtle blade glow light in skill's brand color */}
           <pointLight
             ref={bladeGlowRef}
